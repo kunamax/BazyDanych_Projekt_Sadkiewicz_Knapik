@@ -1,0 +1,124 @@
+## <center>  Sprawozdanie </center>
+
+### Schemat bazy danych
+
+![](2024-04-23-21-05-31.png)
+
+### Schemat
+
+```js
+const UserSchema = {
+    $jsonSchema: {
+        bsonType: "object",
+        required: ["name", "surname", "email", "deposit", "chests", "skins"],
+        properties: {
+            name: {
+                bsonType: "string",
+                description: "Must be a string",
+                pattern: "^.{0,20}$"
+            },
+            surname: {
+                bsonType: "string",
+                description: "Must be a string",
+                pattern: "^.{0,20}$"
+            },
+            email: {
+                bsonType: "string",
+                pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            },
+            depostit: {
+                bsonType: "float",
+                minimum: 0
+            },
+            chests: {
+                bsonType: "array",
+                items: {
+                    bsonType: "object",
+                    required: ["chest_id", "quantity"],
+                    properties: {
+                        chest_id: {
+                            bsonType: "ObjectId"
+                        },
+                        quantity: {
+                            bsonType: "int",
+                            minimum: 0
+                        }
+                    }
+                }
+            },
+            skins: {
+                bsonType: "array",
+                items: {
+                    bsonType: "object",
+                    required: ["name", "type", "wear", "pattern", "price"],
+                    properties: {
+                        name: {
+                            bsonType: "string",
+                            description: "Must be a string"
+                        },
+                        type: {
+                            bsonType: "string",
+                            description: "Must be a string"
+                        },
+                        wear: {
+                            bsonType: "float",
+                            minimum: 0.0,
+                            maximum: 1.0
+                        },
+                        pattern: {
+                            bsonType: "int",
+                            minimum: 0
+                        },
+                        price: {
+                            bsonType: "float",
+                            minimum: 0.0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+const ChestSchema = {
+    $jsonSchema: {
+        bsonType: "object",
+        required: ["name", "price", "skins"],
+        properties: {
+            name: {
+                bsonType: "string",
+                description: "Must be a string",
+                pattern: "^.{0,100}$"
+            },
+            price: {
+                bsonType: "float",
+                minimum: 0.0
+            },
+            skins: {
+                bsonType: "array",
+                items: {
+                    bsonType: "object",
+                    required: ["name", "rarity", "odds"],
+                    properties: {
+                        name: {
+                            bsonType: "string",
+                            description: "Must be a string",
+                            pattern: "^.{0,100}$"
+                        },
+                        rarity: {
+                            bsonType: "string",
+                            description: "Must be a string",
+                            pattern: "^.{0,100}$"
+                        },
+                        odds: {
+                            bsonType: "float",
+                            minimum: 0.0,
+                            maximum: 1.0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
