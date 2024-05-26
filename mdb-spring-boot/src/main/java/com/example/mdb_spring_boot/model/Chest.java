@@ -10,7 +10,7 @@ public class Chest {
     @Id
     private String id;
 
-    private final String name;
+    private String name;
     private double price;
     private final List<Skin> skins;
 
@@ -22,5 +22,8 @@ public class Chest {
 
     public void addSkin(Skin skin){
         this.skins.add(skin);
+    }
+    public void removeSkin(Skin skin){
+        this.skins.remove(skin);
     }
 }
