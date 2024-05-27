@@ -26,7 +26,7 @@ const UserSchema = {
                 bsonType: "string",
                 pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
             },
-            depostit: {
+            deposit: {
                 bsonType: "float",
                 minimum: 0
             },
@@ -72,6 +72,10 @@ const UserSchema = {
                         price: {
                             bsonType: "float",
                             minimum: 0.0
+                        },
+                        skin_id: {
+                            bsonType: "string",
+                            description: "UUID"
                         }
                     }
                 }
@@ -98,7 +102,7 @@ const ChestSchema = {
                 bsonType: "array",
                 items: {
                     bsonType: "object",
-                    required: ["name", "rarity", "odds"],
+                    required: ["_id", "name", "rarity", "odds"],
                     properties: {
                         name: {
                             bsonType: "string",
@@ -120,5 +124,352 @@ const ChestSchema = {
             }
         }
     }
+}
+
+const LogSchema = {
+    $jsonSchema: {
+        bsonType: "object",
+        required: ["type", "user_id", "date", "chest_id", "details"],
+        properties: {
+            type: {
+                bsonType: "string",
+                enum: ["CHEST_PURCHASE", "CHEST_OPEN"],
+                description: "Must be either CHEST_PURCHASE or CHEST_OPEN"
+            },
+            user_id: {
+                bsonType: "object"
+            },
+            date: {
+                bsonType: "string",
+                description: "Must be a string"
+            },
+            chest_id: {
+                bsonType: "object"
+            },
+            details: {
+                bsonType: "object",
+                oneOf: [
+                    {
+                        properties: {
+                            chest_price: {
+                                bsonType: "float",
+                                minimum: 0.0
+                            },
+                            quantity: {
+                                bsonType: "int",
+                                minimum = 1
+                            }
+                        },
+                        required: ["chest_price", "quantity"]
+                    },
+                    {
+                        properties: {
+                            skin_opened_id: {
+                                bsonType: "string"
+                            }
+                        },
+                        required: [skin_opened_id]
+                    }
+                ]
+            }
+        }
+    }
+}
+```
+
+## Przykładowe dane:
+
+```js
+// User 1
+
+{
+  "name": "Alice",
+  "surname": "Smith",
+  "email": "alice.smith@example.com",
+  "deposit": 200.50,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf787"),
+      "quantity": 2
+    }
+  ],
+  "skins": [
+    {
+      "name": "M4A1-S | Hyper Beast",
+      "type": "Rifle",
+      "wear": 0.10,
+      "pattern": 45,
+      "price": 300.00,
+      "skin_id": "123e4567-e89b-12d3-a456-426614174000"
+    }
+  ]
+}
+
+// User 2
+
+{
+  "name": "Bob",
+  "surname": "Johnson",
+  "email": "bob.johnson@example.com",
+  "deposit": 100.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf788"),
+      "quantity": 4
+    }
+  ],
+  "skins": [
+    {
+      "name": "Desert Eagle | Blaze",
+      "type": "Pistol",
+      "wear": 0.05,
+      "pattern": 78,
+      "price": 150.00,
+      "skin_id": "223e4567-e89b-12d3-a456-426614174001"
+    }
+  ]
+}
+
+// User 3
+
+{
+  "name": "Charlie",
+  "surname": "Brown",
+  "email": "charlie.brown@example.com",
+  "deposit": 75.25,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf789"),
+      "quantity": 3
+    }
+  ],
+  "skins": [
+    {
+      "name": "AWP | Dragon Lore",
+      "type": "Rifle",
+      "wear": 0.02,
+      "pattern": 101,
+      "price": 1000.00,
+      "skin_id": "323e4567-e89b-12d3-a456-426614174002"
+    }
+  ]
+}
+
+// User 4
+
+{
+  "name": "Diana",
+  "surname": "Prince",
+  "email": "diana.prince@example.com",
+  "deposit": 50.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf790"),
+      "quantity": 1
+    }
+  ],
+  "skins": [
+    {
+      "name": "Glock-18 | Fade",
+      "type": "Pistol",
+      "wear": 0.03,
+      "pattern": 12,
+      "price": 250.00,
+      "skin_id": "423e4567-e89b-12d3-a456-426614174003"
+    }
+  ]
+}
+
+// User 5
+
+{
+  "name": "Eve",
+  "surname": "Adams",
+  "email": "eve.adams@example.com",
+  "deposit": 300.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf791"),
+      "quantity": 5
+    }
+  ],
+  "skins": [
+    {
+      "name": "AK-47 | Vulcan",
+      "type": "Rifle",
+      "wear": 0.07,
+      "pattern": 99,
+      "price": 400.00,
+      "skin_id": "523e4567-e89b-12d3-a456-426614174004"
+    }
+  ]
+}
+
+// Chest 1
+
+{
+  "name": "Bravo Case",
+  "price": 3.00,
+  "skins": [
+    {
+      "_id": "623e4567-e89b-12d3-a456-426614174005",
+      "name": "M4A4 | Howl",
+      "rarity": "Covert",
+      "odds": 0.01
+    },
+    {
+      "_id": "723e4567-e89b-12d3-a456-426614174006",
+      "name": "AK-47 | Fire Serpent",
+      "rarity": "Classified",
+      "odds": 0.02
+    }
+  ]
+}
+
+// Chest 2
+
+{
+  "name": "Vanguard Case",
+  "price": 2.50,
+  "skins": [
+    {
+      "_id": "823e4567-e89b-12d3-a456-426614174007",
+      "name": "P90 | Asiimov",
+      "rarity": "Covert",
+      "odds": 0.015
+    },
+    {
+      "_id": "923e4567-e89b-12d3-a456-426614174008",
+      "name": "M4A1-S | Cyrex",
+      "rarity": "Classified",
+      "odds": 0.03
+    }
+  ]
+}
+
+// Chest 3
+
+{
+  "name": "Spectrum Case",
+  "price": 2.75,
+  "skins": [
+    {
+      "_id": "a23e4567-e89b-12d3-a456-426614174009",
+      "name": "USP-S | Neo-Noir",
+      "rarity": "Covert",
+      "odds": 0.012
+    },
+    {
+      "_id": "b23e4567-e89b-12d3-a456-426614174010",
+      "name": "AWP | Fever Dream",
+      "rarity": "Classified",
+      "odds": 0.025
+    }
+  ]
+}
+
+// Chest 4
+
+{
+  "name": "Gamma Case",
+  "price": 2.00,
+  "skins": [
+    {
+      "_id": "c23e4567-e89b-12d3-a456-426614174011",
+      "name": "M4A1-S | Mecha Industries",
+      "rarity": "Covert",
+      "odds": 0.02
+    },
+    {
+      "_id": "d23e4567-e89b-12d3-a456-426614174012",
+      "name": "Glock-18 | Wasteland Rebel",
+      "rarity": "Classified",
+      "odds": 0.03
+    }
+  ]
+}
+
+// Chest 5
+
+{
+  "name": "Chroma Case",
+  "price": 2.25,
+  "skins": [
+    {
+      "_id": "e23e4567-e89b-12d3-a456-426614174013",
+      "name": "AWP | Man-o'-war",
+      "rarity": "Covert",
+      "odds": 0.01
+    },
+    {
+      "_id": "f23e4567-e89b-12d3-a456-426614174014",
+      "name": "AK-47 | Cartel",
+      "rarity": "Classified",
+      "odds": 0.02
+    }
+  ]
+}
+
+// Log 1
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "123e4567-e89b-12d3-a456-426614174000",
+  "date": "2024-05-27T12:00:00Z",
+  "chest_id": "60ad0bedf123f10d446cf787",
+  "details": {
+    "chest_price": 3.00,
+    "quantity": 2
+  }
+}
+
+// Log 2
+
+{
+  "type": "CHEST_OPEN",
+  "user_id": "223e4567-e89b-12d3-a456-426614174001",
+  "date": "2024-05-27T12:15:00Z",
+  "chest_id": "60ad0bedf123f10d446cf788",
+  "details": {
+    "skin_opened_id": "623e4567-e89b-12d3-a456-426614174005"
+  }
+}
+
+// Log 3
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "323e4567-e89b-12d3-a456-426614174002",
+  "date": "2024-05-27T12:30:00Z",
+  "chest_id": "60ad0bedf123f10d446cf789",
+  "details": {
+    "chest_price": 2.50,
+    "quantity": 1
+  }
+}
+
+// Log 4
+
+{
+  "type": "CHEST_OPEN",
+  "user_id": "423e4567-e89b-12d3-a456-426614174003",
+  "date": "2024-05-27T12:45:00Z",
+  "chest_id": "60ad0bedf123f10d446cf790",
+  "details": {
+    "skin_opened_id": "823e4567-e89b-12d3-a456-426614174007"
+  }
+}
+
+// Log 5
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "523e4567-e89b-12d3-a456-426614174004",
+  "date": "2024-05-27T13:00:00Z",
+  "chest_id": "60ad0bedf123f10d446cf791",
+  "details": {
+    "chest_price": 2.75,
+    "quantity": 3
+  }
 }
 ```
