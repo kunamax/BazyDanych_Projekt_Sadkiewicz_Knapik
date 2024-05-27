@@ -8,172 +8,218 @@
 
 ```js
 const UserSchema = {
-    $jsonSchema: {
-        bsonType: "object",
-        required: ["name", "surname", "email", "deposit", "chests", "skins"],
-        properties: {
-            name: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,20}$"
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'name',
+      'surname',
+      'email',
+      'deposit',
+      'chests',
+      'skins'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,20}$'
+      },
+      surname: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,20}$'
+      },
+      email: {
+        bsonType: 'string',
+        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'
+      },
+      deposit: {
+        bsonType: 'double',
+        minimum: 0
+      },
+      chests: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            'chest_id',
+            'quantity'
+          ],
+          properties: {
+            chest_id: {
+              bsonType: 'objectId'
             },
-            surname: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,20}$"
-            },
-            email: {
-                bsonType: "string",
-                pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            },
-            deposit: {
-                bsonType: "float",
-                minimum: 0
-            },
-            chests: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["chest_id", "quantity"],
-                    properties: {
-                        chest_id: {
-                            bsonType: "ObjectId"
-                        },
-                        quantity: {
-                            bsonType: "int",
-                            minimum: 0
-                        }
-                    }
-                }
-            },
-            skins: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["name", "type", "wear", "pattern", "price"],
-                    properties: {
-                        name: {
-                            bsonType: "string",
-                            description: "Must be a string"
-                        },
-                        type: {
-                            bsonType: "string",
-                            description: "Must be a string"
-                        },
-                        wear: {
-                            bsonType: "float",
-                            minimum: 0.0,
-                            maximum: 1.0
-                        },
-                        pattern: {
-                            bsonType: "int",
-                            minimum: 0
-                        },
-                        price: {
-                            bsonType: "float",
-                            minimum: 0.0
-                        },
-                        skin_id: {
-                            bsonType: "string",
-                            description: "UUID"
-                        }
-                    }
-                }
+            quantity: {
+              bsonType: 'int',
+              minimum: 0
             }
+          }
         }
+      },
+      skins: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            '_id',
+            'name',
+            'type',
+            'wear',
+            'pattern',
+            'price',
+            'skin_id'
+          ],
+          properties: {
+            _id: {
+              bsonType: 'objectId'
+            },
+            name: {
+              bsonType: 'string',
+              description: 'Must be a string'
+            },
+            type: {
+              bsonType: 'string',
+              description: 'Must be a string'
+            },
+            wear: {
+              bsonType: 'double',
+              minimum: 0,
+              maximum: 1
+            },
+            pattern: {
+              bsonType: 'int',
+              minimum: 0
+            },
+            price: {
+              bsonType: 'double',
+              minimum: 0
+            },
+            skin_id: {
+              bsonType: 'objectId'
+            }
+          }
+        }
+      }
     }
+  }
 }
 
 const ChestSchema = {
-    $jsonSchema: {
-        bsonType: "object",
-        required: ["name", "price", "skins"],
-        properties: {
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'name',
+      'price',
+      'skins'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,100}$'
+      },
+      price: {
+        bsonType: 'double',
+        minimum: 0
+      },
+      skins: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            '_id',
+            'name',
+            'rarity',
+            'odds'
+          ],
+          properties: {
+            _id: {
+              bsonType: 'objectId'
+            },
             name: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,100}$"
+              bsonType: 'string',
+              description: 'Must be a string',
+              pattern: '^.{0,100}$'
             },
-            price: {
-                bsonType: "float",
-                minimum: 0.0
+            rarity: {
+              bsonType: 'string',
+              description: 'Must be a string',
+              pattern: '^.{0,100}$'
             },
-            skins: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["_id", "name", "rarity", "odds"],
-                    properties: {
-                        name: {
-                            bsonType: "string",
-                            description: "Must be a string",
-                            pattern: "^.{0,100}$"
-                        },
-                        rarity: {
-                            bsonType: "string",
-                            description: "Must be a string",
-                            pattern: "^.{0,100}$"
-                        },
-                        odds: {
-                            bsonType: "float",
-                            minimum: 0.0,
-                            maximum: 1.0
-                        }
-                    }
-                }
+            odds: {
+              bsonType: 'double',
+              minimum: 0,
+              maximum: 1
             }
+          }
         }
+      }
     }
+  }
 }
 
 const LogSchema = {
-    $jsonSchema: {
-        bsonType: "object",
-        required: ["type", "user_id", "date", "chest_id", "details"],
-        properties: {
-            type: {
-                bsonType: "string",
-                enum: ["CHEST_PURCHASE", "CHEST_OPEN"],
-                description: "Must be either CHEST_PURCHASE or CHEST_OPEN"
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'type',
+      'user_id',
+      'date',
+      'chest_id',
+      'details'
+    ],
+    properties: {
+      type: {
+        bsonType: 'string',
+        'enum': [
+          'CHEST_PURCHASE',
+          'CHEST_OPEN'
+        ],
+        description: 'Must be either CHEST_PURCHASE or CHEST_OPEN'
+      },
+      user_id: {
+        bsonType: 'objectId'
+      },
+      date: {
+        bsonType: 'string',
+        description: 'Must be a string'
+      },
+      chest_id: {
+        bsonType: 'objectId'
+      },
+      details: {
+        bsonType: 'object',
+        oneOf: [
+          {
+            properties: {
+              chest_price: {
+                bsonType: 'double',
+                minimum: 0
+              },
+              quantity: {
+                bsonType: 'int',
+                minimum: 1
+              }
             },
-            user_id: {
-                bsonType: "object"
+            required: [
+              'chest_price',
+              'quantity'
+            ]
+          },
+          {
+            properties: {
+              skin_opened_id: {
+                bsonType: 'objectId'
+              }
             },
-            date: {
-                bsonType: "string",
-                description: "Must be a string"
-            },
-            chest_id: {
-                bsonType: "object"
-            },
-            details: {
-                bsonType: "object",
-                oneOf: [
-                    {
-                        properties: {
-                            chest_price: {
-                                bsonType: "float",
-                                minimum: 0.0
-                            },
-                            quantity: {
-                                bsonType: "int",
-                                minimum = 1
-                            }
-                        },
-                        required: ["chest_price", "quantity"]
-                    },
-                    {
-                        properties: {
-                            skin_opened_id: {
-                                bsonType: "string"
-                            }
-                        },
-                        required: [skin_opened_id]
-                    }
-                ]
-            }
-        }
+            required: [
+              'skin_opened_id'
+            ]
+          }
+        ]
+      }
     }
+  }
 }
 ```
 

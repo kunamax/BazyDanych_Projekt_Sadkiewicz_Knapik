@@ -1,10 +1,13 @@
 package com.example.mdb_spring_boot.model;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 public class DetailPurchase extends Detail {
-    private final float chestPrice;
+    @Field("chest_price")
+    private final double chestPrice;
     private final int quantity;
 
-    public DetailPurchase(float chestPrice, int quantity, String description){
+    public DetailPurchase(double chestPrice, int quantity, String description){
         super(description);
         this.chestPrice = chestPrice;
         this.quantity = quantity;

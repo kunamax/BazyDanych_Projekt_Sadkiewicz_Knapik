@@ -16,9 +16,9 @@ public class User {
     private String email;
     private double deposit;
 
-    private final List<UserChest> chests = new ArrayList<>();
+    private List<UserChest> chests = new ArrayList<>();
 
-    private final List<UserSkin> skins = new ArrayList<>();
+    private List<UserSkin> skins = new ArrayList<>();
 
     public User(String name, String surname, String email, double deposit){
         super();
@@ -34,5 +34,17 @@ public class User {
 
     public void addChest(UserChest chest){
         chests.add(chest);
+    }
+
+    public void setChests(List<UserChest> chests) {
+        this.chests = chests;
+    }
+
+    public void setSkins(List<UserSkin> skins) {
+        this.skins = skins;
+    }
+
+    public String getId(){
+        return id;
     }
 }
