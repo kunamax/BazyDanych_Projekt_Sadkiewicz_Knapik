@@ -26,7 +26,7 @@ const UserSchema = {
                 bsonType: "string",
                 pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
             },
-            depostit: {
+            deposit: {
                 bsonType: "float",
                 minimum: 0
             },
@@ -49,7 +49,7 @@ const UserSchema = {
             skins: {
                 bsonType: "array",
                 items: {
-                    bsonType: "object",
+                    bsonType: "string",
                     required: ["name", "type", "wear", "pattern", "price"],
                     properties: {
                         name: {
@@ -72,6 +72,10 @@ const UserSchema = {
                         price: {
                             bsonType: "float",
                             minimum: 0.0
+                        },
+                        skin_id: {
+                            bsonType: "string",
+                            description: "UUID"
                         }
                     }
                 }
@@ -98,7 +102,7 @@ const ChestSchema = {
                 bsonType: "array",
                 items: {
                     bsonType: "object",
-                    required: ["name", "rarity", "odds"],
+                    required: ["_id", "name", "rarity", "odds"],
                     properties: {
                         name: {
                             bsonType: "string",
@@ -121,4 +125,56 @@ const ChestSchema = {
         }
     }
 }
+
+const LogSchema = {
+    $jsonSchema: {
+        bsonType: "object",
+        required: ["type", "user_id", "date", "chest_id", "details"],
+        properties: {
+            type: {
+                bsonType: "string",
+                enum: ["CHEST_PURCHASE", "CHEST_OPEN"],
+                description: "Must be either CHEST_PURCHASE or CHEST_OPEN"
+            },
+            user_id: {
+                bsonType: "string"
+            },
+            date: {
+                bsonType: "string",
+                description: "Must be a string"
+            },
+            chest_id: {
+                bsonType: "string"
+            },
+            details: {
+                bsonType: "object",
+                oneOf: [
+                    {
+                        properties: {
+                            chest_price: {
+                                bsonType: "float",
+                                minimum: 0.0
+                            },
+                            quantity: {
+                                bsonType: "int",
+                                minimum = 1
+                            }
+                        },
+                        required: ["chest_price", "quantity"]
+                    },
+                    {
+                        properties: {
+                            skin_opened_id: {
+                                bsonType: "string"
+                            }
+                        },
+                        required: [skin_opened_id]
+                    }
+                ]
+            }
+        }
+    }
+}
 ```
+
+## Przykładowe dane:
