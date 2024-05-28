@@ -9,6 +9,8 @@ public class UserChest {
     private ObjectId chestId;
     private int quantity;
 
+    public UserChest(){}
+
     public UserChest(ObjectId chestId){
         this(chestId, 0);
     }

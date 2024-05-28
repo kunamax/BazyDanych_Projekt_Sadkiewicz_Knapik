@@ -14,4 +14,20 @@ public class Skin {
         this.rarity = rarity;
         this.odds = odds;
     }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getRarity(){
+        return rarity;
+    }
+
+    public double getOdds(){
+        return odds;
+    }
 }

@@ -24,4 +24,32 @@ public class UserSkin {
         this.price = price;
         this.skinId = skinId;
     }
+
+    public ObjectId getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public double getWear(){
+        return wear;
+    }
+
+    public int getPattern(){
+        return pattern;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
 }

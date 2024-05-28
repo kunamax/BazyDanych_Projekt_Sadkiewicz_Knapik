@@ -26,4 +26,20 @@ public class Chest {
     public void removeSkin(Skin skin){
         this.skins.remove(skin);
     }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public List<Skin> getSkins(){
+        return skins;
+    }
 }

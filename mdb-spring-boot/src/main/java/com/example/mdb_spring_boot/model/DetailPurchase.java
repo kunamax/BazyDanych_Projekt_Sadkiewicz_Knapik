@@ -12,4 +12,26 @@ public class DetailPurchase extends Detail {
         this.chestPrice = chestPrice;
         this.quantity = quantity;
     }
+
+    public double getChestPrice(){
+        return chestPrice;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_PURCHASE";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailPurchase{" +
+                "chestPrice=" + chestPrice +
+                ", quantity=" + quantity +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
 }
