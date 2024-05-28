@@ -13,4 +13,21 @@ public class DetailOpen extends Detail {
         super(description);
         this.skinId = skinId;
     }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_OPEN";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailOpen{" +
+                "skinId=" + skinId +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
 }

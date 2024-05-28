@@ -1,13 +1,13 @@
 package com.example.mdb_spring_boot;
 
-import com.example.mdb_spring_boot.model.Chest;
-import com.example.mdb_spring_boot.model.User;
-import com.example.mdb_spring_boot.model.UserChest;
-import com.example.mdb_spring_boot.model.UserSkin;
+import com.example.mdb_spring_boot.model.*;
 import com.example.mdb_spring_boot.repository.ChestRepository;
+import com.example.mdb_spring_boot.repository.LogRepository;
 import com.example.mdb_spring_boot.repository.UserRepository;
 
 import com.example.mdb_spring_boot.service.UserService;
+import com.example.mdb_spring_boot.service.ChestService;
+import com.example.mdb_spring_boot.service.LogService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -24,14 +24,21 @@ public class MdbSpringBootApplication {
 
 	private final UserRepository userRepository;
 	private final ChestRepository chestRepository;
+    private final LogRepository logRepository;
 
 	private UserService userService;
+    private ChestService chestService;
+    private LogService logService;
 
 	@Autowired
-	public MdbSpringBootApplication(UserRepository userRepository, ChestRepository chestRepository, UserService userService) {
+	public MdbSpringBootApplication(UserRepository userRepository, ChestRepository chestRepository, LogRepository logRepository,
+                                    UserService userService, ChestService chestService, LogService logService) {
 		this.userRepository = userRepository;
 		this.chestRepository = chestRepository;
+        this.logRepository = logRepository;
 		this.userService = userService;
+        this.chestService = chestService;
+        this.logService = logService;
 	}
 
 	public static void main(String[] args) {
@@ -41,7 +48,24 @@ public class MdbSpringBootApplication {
 		MdbSpringBootApplication application = context.getBean(MdbSpringBootApplication.class);
 		application.testDatabaseConnection();
 
-		User userToAdd = new User("John", "Doe", "john.doe@example.com", 100.0);
+
+        Log logToAdd = new Log(LogType.CHEST_OPEN, new ObjectId("6654cfb53a9a4d464cd31150"), "2024-05-27T13:00:00Z",
+                new ObjectId("6654cfb53a9a4d464cd31153")
+        );
+        logToAdd.addDetail(new DetailOpen(new ObjectId("6654cfb53a9a4d464cd31154"), "Opened skin"));
+        Log log = application.logService.addLog(logToAdd);
+
+
+//		User userToAdd = new User("John", "Doe", "john.doe@example.com", 100.0);
+//        Skin skin1 = new Skin("M4A4 | Howl", "Covert", 0.01);
+//        Skin skin2 = new Skin("AK-47 | Fire Serpent", "Classified", 0.02);
+//        Chest chestToAdd = new Chest("Bravo Case", 3.00, List.of(skin1, skin2));
+//
+//        Chest chest = application.chestService.addChest(chestToAdd);
+
+//        Chest chest = application.chestService.getChestById("665625a5f1523b46b784ae89");
+//        System.out.println(chest.getName());
+
 
 //		User user = application.userService.addUser(userToAdd);
 //		User user = application.userService.getUserById("6654cfb53a9a4d464cd31150");

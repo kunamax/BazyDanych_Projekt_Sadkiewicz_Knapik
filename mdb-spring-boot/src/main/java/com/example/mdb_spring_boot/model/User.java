@@ -47,4 +47,24 @@ public class User {
     public String getId(){
         return id;
     }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getSurname(){
+        return surname;
+    }
+
+    public String getEmail(){
+        return email;
+    }
+
+    public double getDeposit(){
+        return deposit;
+    }
+
+    public List<UserChest> getChests(){
+        return chests;
+    }
 }

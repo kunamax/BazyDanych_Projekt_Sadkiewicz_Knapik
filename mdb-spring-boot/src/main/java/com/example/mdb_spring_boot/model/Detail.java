@@ -6,4 +6,10 @@ public abstract class Detail {
     public Detail(String description){
         this.description = description;
     }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public abstract String getDetailType();
 }
