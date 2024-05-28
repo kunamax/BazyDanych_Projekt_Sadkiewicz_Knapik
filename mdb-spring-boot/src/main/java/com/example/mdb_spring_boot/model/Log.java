@@ -19,22 +19,14 @@ public class Log {
     private String date;
     @Field("chest_id")
     private ObjectId chestId;
-    private List<Detail> details;
+    private Detail details;
 
-    public Log(LogType type, ObjectId userId, String date, ObjectId chestId){
+    public Log(LogType type, ObjectId userId, String date, ObjectId chestId, Detail detail){
         this.type = type;
         this.userId = userId;
         this.date = date;
         this.chestId = chestId;
-        this.details = new ArrayList<>();
-    }
-
-    public void addDetail(Detail detail){
-        details.add(detail);
-    }
-
-    public void removeDetail(Detail detail){
-        details.remove(detail);
+        this.details = detail;
     }
 
     public String getId(){
@@ -57,7 +49,7 @@ public class Log {
         return chestId;
     }
 
-    public List<Detail> getDetails(){
+    public Detail getDetail(){
         return details;
     }
 }

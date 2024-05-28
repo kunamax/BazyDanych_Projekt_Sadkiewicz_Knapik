@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.UUID;
 
 public class DetailOpen extends Detail {
-    @Field("sking_id")
+    @Field("skin_opened_id")
     private final ObjectId skinId;
 
     public DetailOpen(ObjectId skinId, String description){

@@ -49,11 +49,22 @@ public class MdbSpringBootApplication {
 		application.testDatabaseConnection();
 
 
-        Log logToAdd = new Log(LogType.CHEST_OPEN, new ObjectId("6654cfb53a9a4d464cd31150"), "2024-05-27T13:00:00Z",
-                new ObjectId("6654cfb53a9a4d464cd31153")
-        );
-        logToAdd.addDetail(new DetailOpen(new ObjectId("6654cfb53a9a4d464cd31154"), "Opened skin"));
-        Log log = application.logService.addLog(logToAdd);
+//		Detail detail = new DetailOpen(new ObjectId("6654cfb53a9a4d464cd31154"), "Opened skin");
+
+//        Log logToAdd = new Log(LogType.CHEST_OPEN, new ObjectId("6654cfb53a9a4d464cd31150"), "2024-05-27T13:00:00Z",
+//                new ObjectId("6654cfb53a9a4d464cd31153"), detail
+//        );
+//        Log log = application.logService.addLog(logToAdd);
+
+		Detail detail = new DetailPurchase(2137, 420, "O PANIEEEE...");
+		Log logToAdd = new Log(LogType.CHEST_PURCHASE, new ObjectId(
+				"6654cfb53a9a4d464cd31150"),
+				"2024-05-27T13:00:00Z",
+				new ObjectId("6654cfb53a9a4d464cd31153"),
+				detail
+		);
+
+		Log log = application.logService.addLog(logToAdd);
 
 
 //		User userToAdd = new User("John", "Doe", "john.doe@example.com", 100.0);
