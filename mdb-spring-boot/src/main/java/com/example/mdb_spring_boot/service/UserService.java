@@ -7,6 +7,7 @@ import com.example.mdb_spring_boot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,5 +52,9 @@ public class UserService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

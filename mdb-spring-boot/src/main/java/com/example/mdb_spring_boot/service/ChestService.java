@@ -6,6 +6,8 @@ import com.example.mdb_spring_boot.repository.ChestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChestService {
     private final ChestRepository chestRepository;
@@ -27,5 +29,9 @@ public class ChestService {
         Chest chest = chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
         chest.addSkin(skin);
         return chestRepository.save(chest);
+    }
+
+    public List<Chest> getAllChests() {
+        return chestRepository.findAll();
     }
 }
