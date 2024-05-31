@@ -2,6 +2,7 @@ package com.example.mdb_spring_boot.controller;
 
 import com.example.mdb_spring_boot.model.User;
 import com.example.mdb_spring_boot.model.UserChest;
+import com.example.mdb_spring_boot.model.UserSkin;
 import com.example.mdb_spring_boot.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public User addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    @PostMapping("/{userId}/skins")
+    public User addSkinToUser(@PathVariable String userId, @RequestBody UserSkin skin) {
+        return userService.addSkinToUser(userId, skin);
+    }
+
+    @PostMapping("/open-chest")
+    public User openChest(@RequestParam String userId, @RequestParam String chestId, @RequestParam String skinId) {
+        return userService.openChest(userId, chestId, skinId);
     }
 }

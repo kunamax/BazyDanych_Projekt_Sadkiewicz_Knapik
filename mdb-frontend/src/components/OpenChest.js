@@ -7,7 +7,6 @@ function OpenChest() {
         skinOpenedId: ''
     });
     const [message, setMessage] = useState('');
-    const [isError, setIsError] = useState(false);
 
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
@@ -16,33 +15,26 @@ function OpenChest() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8080/api/logs', {
+            const response = await fetch('http://localhost:8080/api/users/open-chest', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: JSON.stringify({
-                    type: 'CHEST_OPEN',
-                    user_id: data.userId,
-                    chest_id: data.chestId,
-                    date: new Date().toISOString(),
-                    details: {
-                        skin_opened_id: data.skinOpenedId
-                    }
+                body: new URLSearchParams({
+                    userId: data.userId,
+                    chestId: data.chestId,
+                    skinId: data.skinOpenedId
                 })
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to open chest: ${errorData.message}`);
+                throw new Error('Failed to open chest');
             }
 
             setMessage('Chest opened successfully!');
-            setIsError(false);
         } catch (error) {
             console.error('Error opening chest:', error);
-            setMessage('Error opening chest: ' + error.message);
-            setIsError(true);
+            setMessage('Error opening chest');
         }
     };
 
@@ -73,7 +65,7 @@ function OpenChest() {
                 />
                 <button type="submit">Open Chest</button>
             </form>
-            {message && <p className={isError ? 'error' : ''}>{message}</p>}
+            {message && <p>{message}</p>}
         </div>
     );
 }
