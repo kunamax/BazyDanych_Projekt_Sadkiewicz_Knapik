@@ -1,10 +1,16 @@
 ## <center>  Sprawozdanie </center>
 
-### Schemat bazy danych
+## <center> Jakub Sadkiewicz Bartosz Knapik </center>
+
+## Temat projektu
+
+### Nasz projekt bazy danych został stworzony z myślą o przechowywaniu skórek i ich zdoobywaniu poprzez otwieranie specjalnych skrzynek w aplikacjach podobnych do popularnych gier, takich jak Counter-Strike: Global Offensive. Projekt ten ma na celu ułatwienie użytkownikom zarządzania swoimi zasobami, takimi jak skrzynie i skórki, a także śledzenie transakcji związanych z ich zakupem i otwieraniem.
+
+## Poglądowy schemat bazy danych
 
 ![](2024-05-26-17-28-37.png)
 
-### Schemat
+## Walidacja danych w bazie danych
 
 ```js
 const UserSchema = {
@@ -517,5 +523,788 @@ const LogSchema = {
     "chest_price": 2.75,
     "quantity": 3
   }
+}
+```
+
+## Wykorzystane technologie back-end
+
+### Podczas projektowania backendu dla naszej aplikacji do zarządzania skrzynkami i skórkami zdecydowaliśmy się na wykorzystanie technologii Spring Boot. Jest to jedno z najbardziej popularnych i wszechstronnych narzędzi w ekosystemie Java, co czyni go idealnym wyborem dla tego typu aplikacji.
+
+### Poniej znajdują się poszczególne klasy obsługujące naszą bazę danych w technologii Spring Boot
+
+# Moduł `model`
+
+## Skin.java
+
+### Opis: Model reprezentujący skórkę. Zawiera pola takie jak nazwa, rzadkość, oraz szansa na zdobycie skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import java.util.UUID;
+
+public class Skin {
+    private String id;
+    private String name;
+    private String rarity;
+    private double odds;
+
+    public Skin(String name, String rarity, double odds) {
+        this.id = UUID.randomUUID().toString();
+        this.name = name;
+        this.rarity = rarity;
+        this.odds = odds;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getRarity(){
+        return rarity;
+    }
+
+    public double getOdds(){
+        return odds;
+    }
+}
+```
+
+## User.java
+
+### Opis: Model reprezentujący użytkownika. Zawiera pola takie jak imię, nazwisko, email, depozyt oraz listy skrzyń i skór należących do użytkownika.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Document("users")
+public class User {
+    @Id
+    private String id;
+
+    private String name;
+    private String surname;
+    private String email;
+    private double deposit;
+
+    private List<UserChest> chests = new ArrayList<>();
+
+    private List<UserSkin> skins = new ArrayList<>();
+
+    public User(String name, String surname, String email, double deposit){
+        super();
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.deposit = deposit;
+    }
+
+    public void addSkin(UserSkin skin){
+        skins.add(skin);
+    }
+
+    public void addChest(UserChest chest){
+        chests.add(chest);
+    }
+
+    public void setChests(List<UserChest> chests) {
+        this.chests = chests;
+    }
+
+    public void setSkins(List<UserSkin> skins) {
+        this.skins = skins;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getSurname(){
+        return surname;
+    }
+
+    public String getEmail(){
+        return email;
+    }
+
+    public double getDeposit(){
+        return deposit;
+    }
+
+    public List<UserChest> getChests(){
+        return chests;
+    }
+}
+```
+
+## UserChest.java
+
+### Opis: Model reprezentujący skrzynię należącą do użytkownika. Zawiera pola chestId oraz quantity, które przechowują odpowiednio identyfikator skrzyni oraz ilość posiadanych skrzyń.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+public class UserChest {
+
+    @Field("chest_id")
+    private ObjectId chestId;
+    private int quantity;
+
+    public UserChest(){}
+
+    public UserChest(ObjectId chestId){
+        this(chestId, 0);
+    }
+
+    public UserChest(ObjectId chestId, int quantity){
+        this.chestId = chestId;
+        this.quantity = quantity;
+    }
+
+    public void setQuantity(int quantity){
+        this.quantity = quantity;
+    }
+}
+```
+
+## UserSkin.java
+
+### Opis: Model reprezentujący skórkę należącą do użytkownika. Zawiera pola takie jak nazwa, typ, zużycie, wzór, cena oraz UUID skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+public class UserSkin {
+    private ObjectId id;
+    private String name;
+    private String type;
+    private double wear;
+    private int pattern;
+    private double price;
+    @Field("skin_id")
+    private ObjectId skinId;
+
+    public UserSkin(String name, String type, double wear, int pattern, double price, ObjectId skinId){
+        this.id = new ObjectId();
+        this.name = name;
+        this.type = type;
+        this.wear = wear;
+        this.pattern = pattern;
+        this.price = price;
+        this.skinId = skinId;
+    }
+
+    public ObjectId getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public double getWear(){
+        return wear;
+    }
+
+    public int getPattern(){
+        return pattern;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
+}
+```
+
+## Chest.java
+
+### Opis: Model reprezentujący skrzynię. Zawiera pola takie jak nazwa skrzyni, cena oraz lista skórek dostępnych w skrzyni.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
+
+@Document("chests")
+public class Chest {
+    @Id
+    private String id;
+
+    private String name;
+    private double price;
+    private final List<Skin> skins;
+
+    public Chest(String name, double price, List<Skin> skins){
+        this.name = name;
+        this.price = price;
+        this.skins = skins;
+    }
+
+    public void addSkin(Skin skin){
+        this.skins.add(skin);
+    }
+    public void removeSkin(Skin skin){
+        this.skins.remove(skin);
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public List<Skin> getSkins(){
+        return skins;
+    }
+}
+```
+
+## Log.java
+
+### Opis: Model reprezentujący log. Zawiera pola takie jak typ logu, identyfikator użytkownika, data, identyfikator skrzyni oraz szczegóły logu.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Document("logs")
+public class Log {
+    @Id
+    private String id;
+
+    private LogType type;
+    @Field("user_id")
+    private ObjectId userId;
+    private String date;
+    @Field("chest_id")
+    private ObjectId chestId;
+    private Detail details;
+
+    public Log(LogType type, ObjectId userId, String date, ObjectId chestId, Detail detail){
+        this.type = type;
+        this.userId = userId;
+        this.date = date;
+        this.chestId = chestId;
+        this.details = detail;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public LogType getType(){
+        return type;
+    }
+
+    public ObjectId getUserId(){
+        return userId;
+    }
+
+    public String getDate(){
+        return date;
+    }
+
+    public ObjectId getChestId(){
+        return chestId;
+    }
+
+    public Detail getDetail(){
+        return details;
+    }
+}
+```
+
+## LogType.java
+
+### Opis: Enum definiujący typy logów (CHEST_PURCHASE, CHEST_OPEN).
+
+```java
+package com.example.mdb_spring_boot.model;
+
+public enum LogType {
+    CHEST_PURCHASE,
+    CHEST_OPEN
+}
+```
+
+## Detail.java
+
+### Opis: Model bazowy dla szczegółów logów. Używany jako klasa nadrzędna dla DetailOpen i DetailPurchase.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+public abstract class Detail {
+    private final String description;
+
+    public Detail(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public abstract String getDetailType();
+}
+```
+
+## DetailOpen.java
+
+### Opis: Model reprezentujący szczegóły logu dotyczącego otwarcia skrzyni. Zawiera pole skinOpenedId, które przechowuje UUID otwartej skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+public class DetailOpen extends Detail {
+    @Field("skin_opened_id")
+    private final ObjectId skinId;
+
+    public DetailOpen(ObjectId skinId, String description){
+        super(description);
+        this.skinId = skinId;
+    }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_OPEN";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailOpen{" +
+                "skinId=" + skinId +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
+}
+```
+
+## DetailPurchase.java
+
+### Opis: Model reprezentujący szczegóły logu dotyczącego zakupu skrzyni. Zawiera pola chestPrice i quantity, które przechowują odpowiednio cenę skrzyni i ilość zakupionych skrzyń.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.mongodb.core.mapping.Field;
+
+public class DetailPurchase extends Detail {
+    @Field("chest_price")
+    private final double chestPrice;
+    private final int quantity;
+
+    public DetailPurchase(double chestPrice, int quantity, String description){
+        super(description);
+        this.chestPrice = chestPrice;
+        this.quantity = quantity;
+    }
+
+    public double getChestPrice(){
+        return chestPrice;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_PURCHASE";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailPurchase{" +
+                "chestPrice=" + chestPrice +
+                ", quantity=" + quantity +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
+}
+```
+
+# Moduł `repository`
+
+## UserRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji użytkowników. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.User;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRepository extends MongoRepository<User, String> {
+}
+```
+
+## ChestRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji skrzyń. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.Chest;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ChestRepository extends MongoRepository<Chest, String> {
+}
+```
+
+## LogRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji logów. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.Log;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface LogRepository extends MongoRepository<Log, String> {
+}
+```
+
+# Moduł `service`
+
+## UserService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą użytkowników. Oferuje metody do dodawania nowych użytkowników, dodawania skrzyń i skór do użytkowników oraz pobierania szczegółów użytkowników.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.model.User;
+import com.example.mdb_spring_boot.model.UserChest;
+import com.example.mdb_spring_boot.model.UserSkin;
+import com.example.mdb_spring_boot.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+
+    public User addUser(User user){
+        return userRepository.save(user);
+    }
+
+    public User addChestToUser(String userId, UserChest chest) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.addChest(chest);
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public User addSkinToUser(String userId, UserSkin skin) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.addSkin(skin);
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public User getUserById(String userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+}
+```
+
+## ChestService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą skrzyń. Oferuje metody do dodawania nowych skrzyń, dodawania skór do skrzyń oraz pobierania szczegółów skrzyń.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.model.Chest;
+import com.example.mdb_spring_boot.model.Skin;
+import com.example.mdb_spring_boot.repository.ChestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ChestService {
+    private final ChestRepository chestRepository;
+
+    @Autowired
+    public ChestService(ChestRepository chestRepository){
+        this.chestRepository = chestRepository;
+    }
+
+    public Chest addChest(Chest chest){
+        return chestRepository.save(chest);
+    }
+
+    public Chest getChestById(String chestId){
+        return chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
+    }
+
+    public Chest addSkinToChest(String chestId, Skin skin){
+        Chest chest = chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
+        chest.addSkin(skin);
+        return chestRepository.save(chest);
+    }
+
+    public List<Chest> getAllChests() {
+        return chestRepository.findAll();
+    }
+}
+```
+
+## LogService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą logów. Oferuje metody do dodawania nowych logów oraz pobierania szczegółów logów.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.repository.LogRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.example.mdb_spring_boot.model.Log;
+
+import java.util.Optional;
+
+@Service
+public class LogService {
+    private final LogRepository logRepository;
+
+    @Autowired
+    public LogService(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
+
+    public Log addLog(Log log) {
+        return logRepository.save(log);
+    }
+
+    public Log getLogById(String logId) {
+        Optional<Log> optionalLog = logRepository.findById(logId);
+        if (optionalLog.isPresent()) {
+            return optionalLog.get();
+        } else {
+            throw new RuntimeException("Log not found");
+        }
+    }
+}
+```
+
+# Moduł `controller`
+
+## UserController.java
+
+### Opis: Kontroler REST dla zarządzania operacjami związanymi z użytkownikami. Oferuje endpointy do dodawania nowych użytkowników, dodawania skrzyń i skór do użytkowników oraz pobierania szczegółów użytkowników.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.model.User;
+import com.example.mdb_spring_boot.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    public User addUser(@RequestBody User user) {
+        return userService.addUser(user);
+    }
+}
+```
+
+## ChestController.java
+
+### Opis: Kontroler REST dla zarządzania operacjami związanymi ze skrzyniami. Oferuje endpointy do dodawania nowych skrzyń, dodawania skór do skrzyń oraz pobierania szczegółów skrzyń.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.model.Chest;
+import com.example.mdb_spring_boot.service.ChestService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/chests")
+public class ChestController {
+    private final ChestService chestService;
+
+    @Autowired
+    public ChestController(ChestService chestService) {
+        this.chestService = chestService;
+    }
+
+    @PostMapping
+    public Chest addChest(@RequestBody Chest chest) {
+        return chestService.addChest(chest);
+    }
+}
+```
+
+## LogController.java
+
+### Opis: Kontroler REST do zarządzania logami. Oferuje endpointy do dodawania nowych logów oraz pobierania szczegółów logów.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.service.LogService;
+import com.example.mdb_spring_boot.model.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/logs")
+public class LogController {
+    private final LogService logService;
+
+    @Autowired
+    public LogController(LogService logService) {
+        this.logService = logService;
+    }
+
+    @PostMapping
+    public Log addLog(@RequestBody Log log) {
+        return logService.addLog(log);
+    }
+}
+```
+
+# Moduł `config`
+
+## CorsConfig.java
+
+### Opis: Klasa konfiguracyjna do ustawiania zasad CORS (Cross-Origin Resource Sharing). Umożliwia kontrolowanie, które źródła mogą uzyskiwać dostęp do zasobów API.
+
+```java
+package com.example.mdb_spring_boot.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**") // Adjust the mapping as needed
+                        .allowedOrigins("http://localhost:3000") // Allow requests from this origin
+                        .allowedMethods("GET", "POST", "PUT", "DELETE"); // Allow these HTTP methods
+            }
+        };
+    }
 }
 ```
