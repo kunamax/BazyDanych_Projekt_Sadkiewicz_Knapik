@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.mdb_spring_boot.model.Log;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,7 +19,12 @@ public class LogService {
     }
 
     public Log addLog(Log log) {
+        log.setDate(new Date().toString());
         return logRepository.save(log);
+    }
+
+    public List<Log> getAllLogs() {
+        return logRepository.findAll();
     }
 
     public Log getLogById(String logId) {

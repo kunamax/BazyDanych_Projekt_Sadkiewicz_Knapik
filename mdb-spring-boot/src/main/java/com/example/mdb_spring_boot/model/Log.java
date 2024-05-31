@@ -52,4 +52,8 @@ public class Log {
     public Detail getDetail(){
         return details;
     }
+
+    public void setDate(String date){
+        this.date = date;
+    }
 }
