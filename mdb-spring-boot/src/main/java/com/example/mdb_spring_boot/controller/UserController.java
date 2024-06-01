@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @PostMapping
+    public User addUser(@RequestBody User user){
+        return userService.addUser(user);
+    }
+
     @PostMapping("/{userId}/chests")
     public User addChestToUser(@PathVariable String userId, @RequestBody UserChest chest) {
         chest.setChestId(new ObjectId(chest.getChestId().toString()));

@@ -36,6 +36,13 @@ public class User {
         chests.add(chest);
     }
 
+    public void afterOpeningChest(UserChest chest){
+        if (chest.getQuantity() == 1)
+            chests.remove(chest);
+        else
+            chest.setQuantity(chest.getQuantity() - 1);
+    }
+
     public void setChests(List<UserChest> chests) {
         this.chests = chests;
     }

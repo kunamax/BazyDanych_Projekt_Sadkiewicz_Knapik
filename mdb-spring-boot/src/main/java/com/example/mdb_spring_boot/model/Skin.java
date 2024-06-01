@@ -1,21 +1,23 @@
 package com.example.mdb_spring_boot.model;
 
+import org.bson.types.ObjectId;
+
 import java.util.UUID;
 
 public class Skin {
-    private String id;
+    private ObjectId id;
     private String name;
     private String rarity;
     private double odds;
 
     public Skin(String name, String rarity, double odds) {
-        this.id = UUID.randomUUID().toString();
+        this.id = new ObjectId();
         this.name = name;
         this.rarity = rarity;
         this.odds = odds;
     }
 
-    public String getId(){
+    public ObjectId getId(){
         return id;
     }
 

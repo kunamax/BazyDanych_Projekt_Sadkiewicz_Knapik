@@ -1,8 +1,10 @@
 package com.example.mdb_spring_boot.service;
 
 import com.example.mdb_spring_boot.model.*;
+import com.example.mdb_spring_boot.repository.ChestRepository;
 import com.example.mdb_spring_boot.repository.LogRepository;
 import com.example.mdb_spring_boot.repository.UserRepository;
+import com.example.mdb_spring_boot.util.DrawingMachine;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,15 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final LogRepository logRepository;
+    private final ChestRepository chestRepository;
+
+    private final DrawingMachine drawingMachine = new DrawingMachine();
 
     @Autowired
-    public UserService(UserRepository userRepository, LogRepository logRepository){
+    public UserService(UserRepository userRepository, LogRepository logRepository, ChestRepository chestRepository){
         this.userRepository = userRepository;
         this.logRepository = logRepository;
+        this.chestRepository = chestRepository;
     }
 
     public User addUser(User user){
@@ -59,31 +65,43 @@ public class UserService {
             User user = optionalUser.get();
 
             // Tutaj musimy znaleźć skrzynkę użytkownika
-            Optional<UserChest> optionalChest = user.getChests().stream()
+            Optional<UserChest> optionalUserChest = user.getChests().stream()
                     .filter(c -> c.getChestId().toString().equals(chestId))
                     .findFirst();
 
-            if (optionalChest.isPresent()) {
-                UserChest chest = optionalChest.get();
+            if (optionalUserChest.isPresent()) {
+                UserChest userChest = optionalUserChest.get();
+                Optional<Chest> optionalChest = chestRepository.findAll().stream()
+                        .filter(c -> c.getId().toString().equals(chestId))
+                        .findFirst();
 
+                if (optionalChest.isPresent()){
+                    Chest chest = optionalChest.get();
+                    UserSkin skin = drawingMachine.getRandomSkin(chest);
+                    user.addSkin(skin);
+
+                    // Tworzymy log otwierania skrzynki
+                    Detail detail = new DetailOpen(skin.getSkinId(), "Opened skin");
+                    Log log = new Log(LogType.CHEST_OPEN, new ObjectId(userId), new Date().toString(), new ObjectId(chestId), detail);
+                    logRepository.save(log);
+
+                    user.afterOpeningChest(userChest);
+
+                    // Zapisujemy zmiany w użytkowniku
+                    return userRepository.save(user);
+                }
+                else{
+                    throw new RuntimeException("Chest does not exist");
+                }
                 // Tworzymy nową skórkę i dodajemy ją do użytkownika
-                UserSkin skin = new UserSkin(
-                        "M4A1-S | Hyper Beast",
-                        "Rifle",
-                        0.10,
-                        45,
-                        300.00,
-                        new ObjectId(skinId)
-                );
-                user.addSkin(skin);
-
-                // Tworzymy log otwierania skrzynki
-                Detail detail = new DetailOpen(new ObjectId(chestId), "Opened skin");
-                Log log = new Log(LogType.CHEST_OPEN, new ObjectId(userId), new Date().toString(), new ObjectId(chestId), detail);
-                logRepository.save(log);
-
-                // Zapisujemy zmiany w użytkowniku
-                return userRepository.save(user);
+//                UserSkin skin = new UserSkin(
+//                        "M4A1-S | Hyper Beast",
+//                        "Rifle",
+//                        0.10,
+//                        45,
+//                        300.00,
+//                        new ObjectId(skinId)
+//                );
             } else {
                 throw new RuntimeException("Chest not found for user");
             }
