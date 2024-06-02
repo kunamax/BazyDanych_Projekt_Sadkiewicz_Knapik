@@ -1,8 +1,11 @@
 package com.example.mdb_spring_boot.service;
 
+import ch.qos.logback.core.joran.util.AggregationAssessor;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.model.*;
 import org.bson.BsonDateTime;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.bson.Document;
@@ -23,6 +26,45 @@ public class ReportService {
     @Autowired
     public ReportService(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
+    }
+
+    public Iterable<Document> generateUsersTotalSkinsValues(){
+        AggregateIterable<Document> result = mongoTemplate.getCollection("users").aggregate(Arrays.asList(
+                Aggregates.unwind("$skins"),
+                Aggregates.group(
+                        new Document("_id", "$_id").append("name", "$name"),
+                        Accumulators.sum("totalValue", "$skins.price")
+                ),
+                Aggregates.sort(Sorts.descending("totalValue"))
+        ));
+        for (Document doc : result) {
+            System.out.println(doc.toJson());
+        }
+
+        return result;
+    }
+
+    public Iterable<Document> generateUserTotalSpending(ObjectId userId){
+        AggregateIterable<Document> result = mongoTemplate.getCollection("logs").aggregate(Arrays.asList(
+                Aggregates.match(Filters.eq("user_id", userId)),
+                Aggregates.match(Filters.eq("type", "CHEST_PURCHASE")),
+                Aggregates.project(
+                        Projections.fields(
+                                Projections.include("user_id", "type"),
+                                Projections.computed("totalAmount",
+                                        new Document("$multiply", Arrays.asList("$details.chest_price", "$details.quantity")))
+                        )
+                ),
+                Aggregates.group(userId,
+                        Accumulators.sum("totalAmount", "$totalAmount")
+                )
+        ));
+
+        for (Document doc : result) {
+            System.out.println(doc.toJson());
+        }
+
+        return result;
     }
 
     public Iterable<Document> generateSkinReport() {

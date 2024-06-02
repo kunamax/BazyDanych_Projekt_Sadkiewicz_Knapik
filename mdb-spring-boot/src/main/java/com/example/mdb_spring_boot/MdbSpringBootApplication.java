@@ -114,11 +114,16 @@ public class MdbSpringBootApplication {
 //		}
 //		System.out.println(results);
 
-		Iterable<Document> report = application.reportService.generateSkinReport();
+//		Iterable<Document> report = application.reportService.generateSkinReport();
 
-		application.userRepository.findAll().stream()
-				.map(User::getId)
-				.forEach(System.out::println);
+		Iterable<Document> report = application.reportService.generateUserTotalSpending(new ObjectId("665c683cc712a74959044421"));
+//		Iterable<Document> report = application.reportService.generateUsersTotalSkinsValues();
+
+//		application.userRepository.findAll().stream()
+//				.map(User::getId)
+//				.forEach(System.out::println);
+
+
 	}
 
 	public void testDatabaseConnection() {
