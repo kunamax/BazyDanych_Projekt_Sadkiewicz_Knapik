@@ -1,124 +1,1932 @@
 ## <center>  Sprawozdanie </center>
 
-### Schemat bazy danych
+## <center> Jakub Sadkiewicz Bartosz Knapik </center>
+
+## Temat projektu
+
+### Nasz projekt bazy danych został stworzony z myślą o przechowywaniu skórek i ich zdoobywaniu poprzez otwieranie specjalnych skrzynek w aplikacjach podobnych do popularnych gier, takich jak Counter-Strike: Global Offensive. Projekt ten ma na celu ułatwienie użytkownikom zarządzania swoimi zasobami, takimi jak skrzynie i skórki, a także śledzenie transakcji związanych z ich zakupem i otwieraniem.
+
+## Poglądowy schemat bazy danych
 
 ![](2024-05-26-17-28-37.png)
 
-### Schemat
+## Walidacja danych w bazie danych
 
 ```js
 const UserSchema = {
-    $jsonSchema: {
-        bsonType: "object",
-        required: ["name", "surname", "email", "deposit", "chests", "skins"],
-        properties: {
-            name: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,20}$"
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'name',
+      'surname',
+      'email',
+      'deposit',
+      'chests',
+      'skins'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,20}$'
+      },
+      surname: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,20}$'
+      },
+      email: {
+        bsonType: 'string',
+        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'
+      },
+      deposit: {
+        bsonType: 'double',
+        minimum: 0
+      },
+      chests: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            'chest_id',
+            'quantity'
+          ],
+          properties: {
+            chest_id: {
+              bsonType: 'objectId'
             },
-            surname: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,20}$"
-            },
-            email: {
-                bsonType: "string",
-                pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            },
-            depostit: {
-                bsonType: "float",
-                minimum: 0
-            },
-            chests: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["chest_id", "quantity"],
-                    properties: {
-                        chest_id: {
-                            bsonType: "ObjectId"
-                        },
-                        quantity: {
-                            bsonType: "int",
-                            minimum: 0
-                        }
-                    }
-                }
-            },
-            skins: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["name", "type", "wear", "pattern", "price"],
-                    properties: {
-                        name: {
-                            bsonType: "string",
-                            description: "Must be a string"
-                        },
-                        type: {
-                            bsonType: "string",
-                            description: "Must be a string"
-                        },
-                        wear: {
-                            bsonType: "float",
-                            minimum: 0.0,
-                            maximum: 1.0
-                        },
-                        pattern: {
-                            bsonType: "int",
-                            minimum: 0
-                        },
-                        price: {
-                            bsonType: "float",
-                            minimum: 0.0
-                        }
-                    }
-                }
+            quantity: {
+              bsonType: 'int',
+              minimum: 0
             }
+          }
         }
+      },
+      skins: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            '_id',
+            'name',
+            'type',
+            'wear',
+            'pattern',
+            'price',
+            'skin_id'
+          ],
+          properties: {
+            _id: {
+              bsonType: 'objectId'
+            },
+            name: {
+              bsonType: 'string',
+              description: 'Must be a string'
+            },
+            type: {
+              bsonType: 'string',
+              description: 'Must be a string'
+            },
+            wear: {
+              bsonType: 'double',
+              minimum: 0,
+              maximum: 1
+            },
+            pattern: {
+              bsonType: 'int',
+              minimum: 0
+            },
+            price: {
+              bsonType: 'double',
+              minimum: 0
+            },
+            skin_id: {
+              bsonType: 'objectId'
+            }
+          }
+        }
+      }
     }
+  }
 }
 
 const ChestSchema = {
-    $jsonSchema: {
-        bsonType: "object",
-        required: ["name", "price", "skins"],
-        properties: {
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'name',
+      'price',
+      'skins'
+    ],
+    properties: {
+      name: {
+        bsonType: 'string',
+        description: 'Must be a string',
+        pattern: '^.{0,100}$'
+      },
+      price: {
+        bsonType: 'double',
+        minimum: 0
+      },
+      skins: {
+        bsonType: 'array',
+        items: {
+          bsonType: 'object',
+          required: [
+            '_id',
+            'name',
+            'rarity',
+            'odds'
+          ],
+          properties: {
+            _id: {
+              bsonType: 'objectId'
+            },
             name: {
-                bsonType: "string",
-                description: "Must be a string",
-                pattern: "^.{0,100}$"
+              bsonType: 'string',
+              description: 'Must be a string',
+              pattern: '^.{0,100}$'
             },
-            price: {
-                bsonType: "float",
-                minimum: 0.0
+            rarity: {
+              bsonType: 'string',
+              description: 'Must be a string',
+              pattern: '^.{0,100}$'
             },
-            skins: {
-                bsonType: "array",
-                items: {
-                    bsonType: "object",
-                    required: ["name", "rarity", "odds"],
-                    properties: {
-                        name: {
-                            bsonType: "string",
-                            description: "Must be a string",
-                            pattern: "^.{0,100}$"
-                        },
-                        rarity: {
-                            bsonType: "string",
-                            description: "Must be a string",
-                            pattern: "^.{0,100}$"
-                        },
-                        odds: {
-                            bsonType: "float",
-                            minimum: 0.0,
-                            maximum: 1.0
-                        }
-                    }
+            odds: {
+              bsonType: 'double',
+              minimum: 0,
+              maximum: 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+const LogSchema = {
+  $jsonSchema: {
+    bsonType: 'object',
+    required: [
+      'type',
+      'user_id',
+      'date',
+      'chest_id',
+      'details'
+    ],
+    properties: {
+      type: {
+        bsonType: 'string',
+        'enum': [
+          'CHEST_PURCHASE',
+          'CHEST_OPEN'
+        ],
+        description: 'Must be either CHEST_PURCHASE or CHEST_OPEN'
+      },
+      user_id: {
+        bsonType: 'objectId'
+      },
+      date: {
+        bsonType: 'string',
+        description: 'Must be a string'
+      },
+      chest_id: {
+        bsonType: 'objectId'
+      },
+      details: {
+        bsonType: 'object',
+        oneOf: [
+          {
+            properties: {
+              chest_price: {
+                bsonType: 'double',
+                minimum: 0
+              },
+              quantity: {
+                bsonType: 'int',
+                minimum: 1
+              }
+            },
+            required: [
+              'chest_price',
+              'quantity'
+            ]
+          },
+          {
+            properties: {
+              skin_opened_id: {
+                bsonType: 'objectId'
+              }
+            },
+            required: [
+              'skin_opened_id'
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Przykładowe dane:
+
+```js
+// User 1
+
+{
+  "name": "Alice",
+  "surname": "Smith",
+  "email": "alice.smith@example.com",
+  "deposit": 200.50,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf787"),
+      "quantity": 2
+    }
+  ],
+  "skins": [
+    {
+      "name": "M4A1-S | Hyper Beast",
+      "type": "Rifle",
+      "wear": 0.10,
+      "pattern": 45,
+      "price": 300.00,
+      "skin_id": "123e4567-e89b-12d3-a456-426614174000"
+    }
+  ]
+}
+
+// User 2
+
+{
+  "name": "Bob",
+  "surname": "Johnson",
+  "email": "bob.johnson@example.com",
+  "deposit": 100.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf788"),
+      "quantity": 4
+    }
+  ],
+  "skins": [
+    {
+      "name": "Desert Eagle | Blaze",
+      "type": "Pistol",
+      "wear": 0.05,
+      "pattern": 78,
+      "price": 150.00,
+      "skin_id": "223e4567-e89b-12d3-a456-426614174001"
+    }
+  ]
+}
+
+// User 3
+
+{
+  "name": "Charlie",
+  "surname": "Brown",
+  "email": "charlie.brown@example.com",
+  "deposit": 75.25,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf789"),
+      "quantity": 3
+    }
+  ],
+  "skins": [
+    {
+      "name": "AWP | Dragon Lore",
+      "type": "Rifle",
+      "wear": 0.02,
+      "pattern": 101,
+      "price": 1000.00,
+      "skin_id": "323e4567-e89b-12d3-a456-426614174002"
+    }
+  ]
+}
+
+// User 4
+
+{
+  "name": "Diana",
+  "surname": "Prince",
+  "email": "diana.prince@example.com",
+  "deposit": 50.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf790"),
+      "quantity": 1
+    }
+  ],
+  "skins": [
+    {
+      "name": "Glock-18 | Fade",
+      "type": "Pistol",
+      "wear": 0.03,
+      "pattern": 12,
+      "price": 250.00,
+      "skin_id": "423e4567-e89b-12d3-a456-426614174003"
+    }
+  ]
+}
+
+// User 5
+
+{
+  "name": "Eve",
+  "surname": "Adams",
+  "email": "eve.adams@example.com",
+  "deposit": 300.00,
+  "chests": [
+    {
+      "chest_id": ObjectId("60ad0bedf123f10d446cf791"),
+      "quantity": 5
+    }
+  ],
+  "skins": [
+    {
+      "name": "AK-47 | Vulcan",
+      "type": "Rifle",
+      "wear": 0.07,
+      "pattern": 99,
+      "price": 400.00,
+      "skin_id": "523e4567-e89b-12d3-a456-426614174004"
+    }
+  ]
+}
+
+// Chest 1
+
+{
+  "name": "Bravo Case",
+  "price": 3.00,
+  "skins": [
+    {
+      "_id": "623e4567-e89b-12d3-a456-426614174005",
+      "name": "M4A4 | Howl",
+      "rarity": "Covert",
+      "odds": 0.01
+    },
+    {
+      "_id": "723e4567-e89b-12d3-a456-426614174006",
+      "name": "AK-47 | Fire Serpent",
+      "rarity": "Classified",
+      "odds": 0.02
+    }
+  ]
+}
+
+// Chest 2
+
+{
+  "name": "Vanguard Case",
+  "price": 2.50,
+  "skins": [
+    {
+      "_id": "823e4567-e89b-12d3-a456-426614174007",
+      "name": "P90 | Asiimov",
+      "rarity": "Covert",
+      "odds": 0.015
+    },
+    {
+      "_id": "923e4567-e89b-12d3-a456-426614174008",
+      "name": "M4A1-S | Cyrex",
+      "rarity": "Classified",
+      "odds": 0.03
+    }
+  ]
+}
+
+// Chest 3
+
+{
+  "name": "Spectrum Case",
+  "price": 2.75,
+  "skins": [
+    {
+      "_id": "a23e4567-e89b-12d3-a456-426614174009",
+      "name": "USP-S | Neo-Noir",
+      "rarity": "Covert",
+      "odds": 0.012
+    },
+    {
+      "_id": "b23e4567-e89b-12d3-a456-426614174010",
+      "name": "AWP | Fever Dream",
+      "rarity": "Classified",
+      "odds": 0.025
+    }
+  ]
+}
+
+// Chest 4
+
+{
+  "name": "Gamma Case",
+  "price": 2.00,
+  "skins": [
+    {
+      "_id": "c23e4567-e89b-12d3-a456-426614174011",
+      "name": "M4A1-S | Mecha Industries",
+      "rarity": "Covert",
+      "odds": 0.02
+    },
+    {
+      "_id": "d23e4567-e89b-12d3-a456-426614174012",
+      "name": "Glock-18 | Wasteland Rebel",
+      "rarity": "Classified",
+      "odds": 0.03
+    }
+  ]
+}
+
+// Chest 5
+
+{
+  "name": "Chroma Case",
+  "price": 2.25,
+  "skins": [
+    {
+      "_id": "e23e4567-e89b-12d3-a456-426614174013",
+      "name": "AWP | Man-o'-war",
+      "rarity": "Covert",
+      "odds": 0.01
+    },
+    {
+      "_id": "f23e4567-e89b-12d3-a456-426614174014",
+      "name": "AK-47 | Cartel",
+      "rarity": "Classified",
+      "odds": 0.02
+    }
+  ]
+}
+
+// Log 1
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "123e4567-e89b-12d3-a456-426614174000",
+  "date": "2024-05-27T12:00:00Z",
+  "chest_id": "60ad0bedf123f10d446cf787",
+  "details": {
+    "chest_price": 3.00,
+    "quantity": 2
+  }
+}
+
+// Log 2
+
+{
+  "type": "CHEST_OPEN",
+  "user_id": "223e4567-e89b-12d3-a456-426614174001",
+  "date": "2024-05-27T12:15:00Z",
+  "chest_id": "60ad0bedf123f10d446cf788",
+  "details": {
+    "skin_opened_id": "623e4567-e89b-12d3-a456-426614174005"
+  }
+}
+
+// Log 3
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "323e4567-e89b-12d3-a456-426614174002",
+  "date": "2024-05-27T12:30:00Z",
+  "chest_id": "60ad0bedf123f10d446cf789",
+  "details": {
+    "chest_price": 2.50,
+    "quantity": 1
+  }
+}
+
+// Log 4
+
+{
+  "type": "CHEST_OPEN",
+  "user_id": "423e4567-e89b-12d3-a456-426614174003",
+  "date": "2024-05-27T12:45:00Z",
+  "chest_id": "60ad0bedf123f10d446cf790",
+  "details": {
+    "skin_opened_id": "823e4567-e89b-12d3-a456-426614174007"
+  }
+}
+
+// Log 5
+
+{
+  "type": "CHEST_PURCHASE",
+  "user_id": "523e4567-e89b-12d3-a456-426614174004",
+  "date": "2024-05-27T13:00:00Z",
+  "chest_id": "60ad0bedf123f10d446cf791",
+  "details": {
+    "chest_price": 2.75,
+    "quantity": 3
+  }
+}
+```
+
+## Wykorzystane technologie back-end
+
+### Podczas projektowania backendu dla naszej aplikacji do zarządzania skrzynkami i skórkami zdecydowaliśmy się na wykorzystanie technologii Spring Boot. Jest to jedno z najbardziej popularnych i wszechstronnych narzędzi w ekosystemie Java, co czyni go idealnym wyborem dla tego typu aplikacji.
+
+### Poniej znajdują się poszczególne klasy obsługujące naszą bazę danych w technologii Spring Boot
+
+# Moduł `model`
+
+## Skin.java
+
+### Opis: Model reprezentujący skórkę. Zawiera pola takie jak nazwa, rzadkość, oraz szansa na zdobycie skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+public class Skin {
+    private ObjectId id;
+    private String name;
+    private String type;
+    private String rarity;
+    private double odds;
+    @Field("base_price")
+    private double basePrice;
+
+    public Skin(String name, String type, String rarity, double odds, double basePrice) {
+        this.id = new ObjectId();
+        this.name = name;
+        this.rarity = rarity;
+        this.type = type;
+        this.odds = odds;
+        this.basePrice = basePrice;
+    }
+
+    public ObjectId getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public String getRarity(){
+        return rarity;
+    }
+
+    public double getOdds(){
+        return odds;
+    }
+
+    public double getBasePrice(){
+        return basePrice;
+    }
+}
+
+```
+
+## User.java
+
+### Opis: Model reprezentujący użytkownika. Zawiera pola takie jak imię, nazwisko, email, depozyt oraz listy skrzyń i skór należących do użytkownika.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Document("users")
+public class User {
+    @Id
+    private String id;
+
+    private String name;
+    private String surname;
+    private String email;
+    private double deposit;
+
+    private List<UserChest> chests = new ArrayList<>();
+
+    private List<UserSkin> skins = new ArrayList<>();
+
+    public User(String name, String surname, String email, double deposit){
+        super();
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.deposit = deposit;
+    }
+
+    public void addSkin(UserSkin skin){
+        skins.add(skin);
+    }
+
+    public void addChest(UserChest chest){
+        for (UserChest ownedChest : this.chests) {
+            if (chest.getChestId().equals(ownedChest.getChestId())) {
+                ownedChest.setQuantity(ownedChest.getQuantity() + chest.getQuantity());
+                return;
+            }
+        }
+        this.chests.add(chest);
+    }
+
+    public void setDeposit(double deposit){
+        this.deposit = deposit;
+    }
+
+    public void addToDeposit(double money){
+        this.deposit += money;
+    }
+
+    public void removeFromDeposit(double money){
+        this.deposit -= money;
+    }
+
+    public void afterOpeningChest(UserChest chest){
+        if (chest.getQuantity() == 1)
+            chests.remove(chest);
+        else
+            chest.setQuantity(chest.getQuantity() - 1);
+    }
+
+    public void setChests(List<UserChest> chests) {
+        this.chests = chests;
+    }
+
+    public void setSkins(List<UserSkin> skins) {
+        this.skins = skins;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getSurname(){
+        return surname;
+    }
+
+    public String getEmail(){
+        return email;
+    }
+
+    public double getDeposit(){
+        return deposit;
+    }
+
+    public List<UserChest> getChests(){
+        return chests;
+    }
+
+    public List<UserSkin> getSkins() {
+        return skins;
+    }
+}
+
+```
+
+## UserChest.java
+
+### Opis: Model reprezentujący skrzynię należącą do użytkownika. Zawiera pola chestId oraz quantity, które przechowują odpowiednio identyfikator skrzyni oraz ilość posiadanych skrzyń.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+public class UserChest {
+
+    @Field("chest_id")
+    private ObjectId chestId;
+    private int quantity;
+
+    public UserChest(){}
+
+    public UserChest(ObjectId chestId){
+        this(chestId, 0);
+    }
+
+    public UserChest(ObjectId chestId, int quantity){
+        this.chestId = chestId;
+        this.quantity = quantity;
+    }
+
+    public ObjectId getChestId(){
+        return chestId;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    public void setQuantity(int quantity){
+        this.quantity = quantity;
+    }
+
+    public void setChestId(ObjectId chestId){
+        this.chestId = chestId;
+    }
+}
+
+```
+
+## UserSkin.java
+
+### Opis: Model reprezentujący skórkę należącą do użytkownika. Zawiera pola takie jak nazwa, typ, zużycie, wzór, cena oraz UUID skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+public class UserSkin {
+    private ObjectId id;
+    private String name;
+    private String type;
+    private double wear;
+    private int pattern;
+    private double price;
+    @Field("skin_id")
+    private ObjectId skinId;
+
+    public UserSkin(String name, String type, double wear, int pattern, double price, ObjectId skinId){
+        this.id = new ObjectId();
+        this.name = name;
+        this.type = type;
+        this.wear = wear;
+        this.pattern = pattern;
+        this.price = price;
+        this.skinId = skinId;
+    }
+
+    public ObjectId getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getType(){
+        return type;
+    }
+
+    public double getWear(){
+        return wear;
+    }
+
+    public int getPattern(){
+        return pattern;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
+}
+```
+
+## Chest.java
+
+### Opis: Model reprezentujący skrzynię. Zawiera pola takie jak nazwa skrzyni, cena oraz lista skórek dostępnych w skrzyni.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
+
+@Document("chests")
+public class Chest {
+    @Id
+    private String id;
+
+    private String name;
+    private double price;
+    private final List<Skin> skins;
+
+    public Chest(String name, double price, List<Skin> skins){
+        this.name = name;
+        this.price = price;
+        this.skins = skins;
+    }
+
+    public void addSkin(Skin skin){
+        this.skins.add(skin);
+    }
+    public void removeSkin(Skin skin){
+        this.skins.remove(skin);
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public List<Skin> getSkins(){
+        return skins;
+    }
+}
+```
+
+## Log.java
+
+### Opis: Model reprezentujący log. Zawiera pola takie jak typ logu, identyfikator użytkownika, data, identyfikator skrzyni oraz szczegóły logu.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Document("logs")
+public class Log {
+    @Id
+    private String id;
+
+    private LogType type;
+    @Field("user_id")
+    private ObjectId userId;
+    private String date;
+    @Field("chest_id")
+    private ObjectId chestId;
+    private Detail details;
+
+    public Log(){}
+
+    public Log(LogType type, ObjectId userId, String date, ObjectId chestId, Detail detail){
+        this.type = type;
+        this.userId = userId;
+        this.date = date;
+        this.chestId = chestId;
+        this.details = detail;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public LogType getType(){
+        return type;
+    }
+
+    public ObjectId getUserId(){
+        return userId;
+    }
+
+    public String getDate(){
+        return date;
+    }
+
+    public ObjectId getChestId(){
+        return chestId;
+    }
+
+    public Detail getDetail(){
+        return details;
+    }
+
+    public void setDate(String date){
+        this.date = date;
+    }
+}
+```
+
+## LogType.java
+
+### Opis: Enum definiujący typy logów (CHEST_PURCHASE, CHEST_OPEN).
+
+```java
+package com.example.mdb_spring_boot.model;
+
+public enum LogType {
+    CHEST_PURCHASE,
+    CHEST_OPEN
+}
+```
+
+## Detail.java
+
+### Opis: Model bazowy dla szczegółów logów. Używany jako klasa nadrzędna dla DetailOpen i DetailPurchase.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+public abstract class Detail {
+    private final String description;
+
+    public Detail(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public abstract String getDetailType();
+}
+```
+
+## DetailOpen.java
+
+### Opis: Model reprezentujący szczegóły logu dotyczącego otwarcia skrzyni. Zawiera pole skinOpenedId, które przechowuje UUID otwartej skórki.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+public class DetailOpen extends Detail {
+    @Field("skin_opened_id")
+    private final ObjectId skinId;
+
+    public DetailOpen(ObjectId skinId, String description){
+        super(description);
+        this.skinId = skinId;
+    }
+
+    public ObjectId getSkinId(){
+        return skinId;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_OPEN";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailOpen{" +
+                "skinId=" + skinId +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
+}
+```
+
+## DetailPurchase.java
+
+### Opis: Model reprezentujący szczegóły logu dotyczącego zakupu skrzyni. Zawiera pola chestPrice i quantity, które przechowują odpowiednio cenę skrzyni i ilość zakupionych skrzyń.
+
+```java
+package com.example.mdb_spring_boot.model;
+
+import org.springframework.data.mongodb.core.mapping.Field;
+
+public class DetailPurchase extends Detail {
+    @Field("chest_price")
+    private final double chestPrice;
+    private final int quantity;
+
+    public DetailPurchase(double chestPrice, int quantity, String description){
+        super(description);
+        this.chestPrice = chestPrice;
+        this.quantity = quantity;
+    }
+
+    public double getChestPrice(){
+        return chestPrice;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    @Override
+    public String getDetailType(){
+        return "CHEST_PURCHASE";
+    }
+
+    @Override
+    public String toString(){
+        return "DetailPurchase{" +
+                "chestPrice=" + chestPrice +
+                ", quantity=" + quantity +
+                ", description='" + getDescription() + '\'' +
+                '}';
+    }
+}
+```
+
+# Moduł `repository`
+
+## UserRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji użytkowników. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.User;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRepository extends MongoRepository<User, String> {
+}
+```
+
+## ChestRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji skrzyń. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.Chest;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ChestRepository extends MongoRepository<Chest, String> {
+}
+```
+
+## LogRepository.java
+
+### Opis: Interfejs repozytorium dla operacji CRUD na kolekcji logów. Dziedziczy po MongoRepository.
+
+```java
+package com.example.mdb_spring_boot.repository;
+
+import com.example.mdb_spring_boot.model.Log;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface LogRepository extends MongoRepository<Log, String> {
+}
+```
+
+# Moduł `service`
+
+## UserService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą użytkowników. Oferuje metody do dodawania nowych użytkowników, dodawania skrzyń i skór do użytkowników oraz pobierania szczegółów użytkowników. Wykorzystaliśmy adnotację `@Transactional`, zeby zapobiec rozspójnieniu dazy danych.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.exception.InsufficientFundsException;
+import com.example.mdb_spring_boot.model.*;
+import com.example.mdb_spring_boot.repository.ChestRepository;
+import com.example.mdb_spring_boot.repository.LogRepository;
+import com.example.mdb_spring_boot.repository.UserRepository;
+import com.example.mdb_spring_boot.util.DrawingMachine;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonArrayBuilder;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+    private final LogRepository logRepository;
+    private final ChestRepository chestRepository;
+
+    private final DrawingMachine drawingMachine = new DrawingMachine();
+
+    @Autowired
+    public UserService(UserRepository userRepository, LogRepository logRepository, ChestRepository chestRepository){
+        this.userRepository = userRepository;
+        this.logRepository = logRepository;
+        this.chestRepository = chestRepository;
+    }
+
+    public User addUser(User user){
+        return userRepository.save(user);
+    }
+
+    public void removeUser(User user){
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public User addChestToUser(String userId, UserChest userChest) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            Optional<Chest> optionalChest = chestRepository.findAll().stream()
+                    .filter(c -> c.getId().equals(userChest.getChestId().toString()))
+                    .findFirst();
+
+            if (optionalChest.isPresent()) {
+                Chest chest = optionalChest.get();
+                double totalPrice = userChest.getQuantity() * chest.getPrice();
+                if (user.getDeposit() >= totalPrice) {
+                    user.addChest(userChest);
+                    user.removeFromDeposit(totalPrice);
+
+                    Detail detail = new DetailPurchase(chest.getPrice(), userChest.getQuantity(), "Chest purchase");
+                    Log log = new Log(LogType.CHEST_PURCHASE, new ObjectId(userId), new Date().toString(), userChest.getChestId(), detail);
+                    logRepository.save(log);
+
+                    return userRepository.save(user);
+                }
+                else{
+                    throw new InsufficientFundsException("User does not have enough money to buy chest or chests");
                 }
             }
+            else {
+                throw new RuntimeException("Chest does not exist");
+            }
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public User addSkinToUser(String userId, UserSkin skin) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.addSkin(skin);
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    @Transactional
+    public User openChest(String userId, String chestId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            // Tutaj musimy znaleźć skrzynkę użytkownika
+            Optional<UserChest> optionalUserChest = user.getChests().stream()
+                    .filter(c -> c.getChestId().toString().equals(chestId))
+                    .findFirst();
+
+            if (optionalUserChest.isPresent()) {
+                UserChest userChest = optionalUserChest.get();
+                Optional<Chest> optionalChest = chestRepository.findAll().stream()
+                        .filter(c -> c.getId().toString().equals(chestId))
+                        .findFirst();
+
+                if (optionalChest.isPresent()){
+                    Chest chest = optionalChest.get();
+                    UserSkin skin = drawingMachine.getRandomSkin(chest);
+                    user.addSkin(skin);
+
+                    // Tworzymy log otwierania skrzynki
+                    Detail detail = new DetailOpen(skin.getId(), "Opened skin");
+                    Log log = new Log(LogType.CHEST_OPEN, new ObjectId(userId), new Date().toString(), new ObjectId(chestId), detail);
+                    logRepository.save(log);
+
+                    user.afterOpeningChest(userChest);
+
+                    // Zapisujemy zmiany w użytkowniku
+                    return userRepository.save(user);
+                }
+                else{
+                    throw new RuntimeException("Chest does not exist");
+                }
+            } else {
+                throw new RuntimeException("Chest not found for user");
+            }
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public User getUserById(String userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public List<JsonObject> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::convertUserToJson)
+                .collect(Collectors.toList());
+    }
+
+    private JsonObject convertUserToJson(User user) {
+        JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+        jsonBuilder.add("id", Json.createObjectBuilder().add("chars", user.getId()).add("string", user.getId()).add("valueType", "STRING"));
+        jsonBuilder.add("name", user.getName());
+        jsonBuilder.add("surname", user.getSurname());
+        jsonBuilder.add("email", user.getEmail());
+        jsonBuilder.add("deposit", Json.createObjectBuilder().add("chars", String.valueOf(user.getDeposit())).add("string", String.valueOf(user.getDeposit())).add("valueType", "NUMBER"));
+
+        JsonArrayBuilder chestsBuilder = Json.createArrayBuilder();
+        user.getChests().forEach(chest -> {
+            JsonObjectBuilder chestBuilder = Json.createObjectBuilder();
+            chestBuilder.add("chestId", Json.createObjectBuilder().add("chars", chest.getChestId().toHexString()).add("string", chest.getChestId().toHexString()).add("valueType", "STRING"));
+            chestBuilder.add("quantity", Json.createObjectBuilder().add("chars", String.valueOf(chest.getQuantity())).add("string", String.valueOf(chest.getQuantity())).add("valueType", "NUMBER"));
+            chestsBuilder.add(chestBuilder);
+        });
+        jsonBuilder.add("chests", chestsBuilder);
+
+        JsonArrayBuilder skinsBuilder = Json.createArrayBuilder();
+        user.getSkins().forEach(skin -> {
+            JsonObjectBuilder skinBuilder = Json.createObjectBuilder();
+            skinBuilder.add("skinId", Json.createObjectBuilder().add("chars", skin.getSkinId().toHexString()).add("string", skin.getSkinId().toHexString()).add("valueType", "STRING"));
+            skinBuilder.add("name", skin.getName());
+            skinBuilder.add("type", skin.getType());
+            skinBuilder.add("wear", Json.createObjectBuilder().add("chars", String.valueOf(skin.getWear())).add("string", String.valueOf(skin.getWear())).add("valueType", "NUMBER"));
+            skinBuilder.add("pattern", Json.createObjectBuilder().add("chars", String.valueOf(skin.getPattern())).add("string", String.valueOf(skin.getPattern())).add("valueType", "NUMBER"));
+            skinBuilder.add("price", Json.createObjectBuilder().add("chars", String.valueOf(skin.getPrice())).add("string", String.valueOf(skin.getPrice())).add("valueType", "NUMBER"));
+            skinsBuilder.add(skinBuilder);
+        });
+        jsonBuilder.add("skins", skinsBuilder);
+
+        return jsonBuilder.build();
+    }
+}
+```
+
+## ChestService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą skrzyń. Oferuje metody do dodawania nowych skrzyń, dodawania skór do skrzyń oraz pobierania szczegółów skrzyń.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.model.Chest;
+import com.example.mdb_spring_boot.model.Skin;
+import com.example.mdb_spring_boot.repository.ChestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class ChestService {
+    private final ChestRepository chestRepository;
+
+    @Autowired
+    public ChestService(ChestRepository chestRepository){
+        this.chestRepository = chestRepository;
+    }
+
+    public Chest addChest(Chest chest){
+        return chestRepository.save(chest);
+    }
+
+    public void removeChest(Chest chest){
+        chestRepository.delete(chest);
+    }
+
+    public Chest getChestById(String chestId){
+        return chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
+    }
+
+    public Chest addSkinToChest(String chestId, Skin skin){
+        Chest chest = chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
+        chest.addSkin(skin);
+        return chestRepository.save(chest);
+    }
+
+    public List<JsonObject> getAllChests() {
+        List<Chest> chests = chestRepository.findAll();
+        return chests.stream()
+                .map(this::convertChestToJson)
+                .collect(Collectors.toList());
+    }
+
+    private JsonObject convertChestToJson(Chest chest) {
+        JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+        jsonBuilder.add("id", Json.createObjectBuilder().add("chars", chest.getId()).add("string", chest.getId()).add("valueType", "STRING"));
+        jsonBuilder.add("name", chest.getName());
+        jsonBuilder.add("price", String.valueOf(chest.getPrice()));
+
+        JsonArrayBuilder skinsBuilder = Json.createArrayBuilder();
+        chest.getSkins().forEach(skin -> {
+            JsonObjectBuilder skinBuilder = Json.createObjectBuilder();
+            skinBuilder.add("name", skin.getName());
+            skinBuilder.add("rarity", skin.getRarity());
+            skinBuilder.add("odds", Json.createObjectBuilder().add("chars", String.valueOf(skin.getOdds())).add("string", String.valueOf(skin.getOdds())).add("valueType", "NUMBER"));
+            skinsBuilder.add(skinBuilder);
+        });
+        jsonBuilder.add("skins", skinsBuilder);
+
+        return jsonBuilder.build();
+    }
+}
+```
+
+## LogService.java
+
+### Opis: Serwis zarządzający logiką biznesową dotyczącą logów. Oferuje metody do dodawania nowych logów oraz pobierania szczegółów logów.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.model.Detail;
+import com.example.mdb_spring_boot.model.DetailOpen;
+import com.example.mdb_spring_boot.model.DetailPurchase;
+import com.example.mdb_spring_boot.repository.LogRepository;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.example.mdb_spring_boot.model.Log;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class LogService {
+    private final LogRepository logRepository;
+
+    @Autowired
+    public LogService(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
+
+    public Log addLog(Log log) {
+        log.setDate(new Date().toString());
+        return logRepository.save(log);
+    }
+
+    public void removeLog(Log log){
+        logRepository.delete(log);
+    }
+
+    public List<JsonObject> getAllLogs() {
+        List<Log> logs = logRepository.findAll();
+        return logs.stream()
+                .map(this::convertLogToJson)
+                .collect(Collectors.toList());
+    }
+
+    private JsonObject convertLogToJson(Log log) {
+        JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+        jsonBuilder.add("id", log.getId());
+        jsonBuilder.add("type", log.getType().toString());
+        jsonBuilder.add("userId", log.getUserId().toHexString());
+        jsonBuilder.add("date", log.getDate());
+        jsonBuilder.add("chestId", log.getChestId().toHexString());
+        jsonBuilder.add("details", convertDetailToJson(log.getDetail()));
+        return jsonBuilder.build();
+    }
+
+    private JsonObject convertDetailToJson(Detail details) {
+        JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+        if (details instanceof DetailPurchase) {
+            DetailPurchase detailPurchase = (DetailPurchase) details;
+            jsonBuilder.add("chestPrice", String.valueOf(detailPurchase.getChestPrice()));
+            jsonBuilder.add("quantity", String.valueOf(detailPurchase.getQuantity()));
+            jsonBuilder.add("description", detailPurchase.getDescription());
+        } else if (details instanceof DetailOpen) {
+            DetailOpen detailOpen = (DetailOpen) details;
+            jsonBuilder.add("skinOpenedId", detailOpen.getSkinId().toHexString());
+            jsonBuilder.add("description", detailOpen.getDescription());
+        }
+        return jsonBuilder.build();
+    }
+
+    public Log getLogById(String logId) {
+        Optional<Log> optionalLog = logRepository.findById(logId);
+        if (optionalLog.isPresent()) {
+            return optionalLog.get();
+        } else {
+            throw new RuntimeException("Log not found");
         }
     }
 }
 ```
+
+## ReportService.java
+
+### Opis: Serwis odpowiedzialny za generowanie raportów na podstawie danych z systemu.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
+
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@Service
+public class ReportService {
+    private final MongoTemplate mongoTemplate;
+
+    @Autowired
+    public ReportService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    public List<JsonObject> generateUsersTotalSkinsValues() {
+        AggregateIterable<Document> result = mongoTemplate.getCollection("users").aggregate(Arrays.asList(
+                new Document("$unwind", "$skins"),
+                new Document("$group", new Document("_id", "$_id")
+                        .append("name", new Document("$first", "$name"))
+                        .append("totalValue", new Document("$sum", "$skins.price"))),
+                new Document("$sort", new Document("totalValue", -1))
+        ));
+
+        return convertDocumentsToJson(result);
+    }
+
+
+    public List<JsonObject> generateUserTotalSpending(ObjectId userId) {
+        MongoCollection<Document> collection = mongoTemplate.getCollection("logs");
+        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+                new Document("$match", new Document("user_id", userId)),
+                new Document("$match", new Document("type", "CHEST_PURCHASE")),
+                new Document("$project", new Document("user_id", 1).append("type", 1)
+                        .append("totalAmount", new Document("$multiply", Arrays.asList("$details.chest_price", "$details.quantity")))),
+                new Document("$group", new Document("_id", "$user_id").append("totalAmount", new Document("$sum", "$totalAmount")))
+        ));
+
+        return convertDocumentsToJson(result);
+    }
+
+    public List<JsonObject> generateSkinReport() {
+        MongoCollection<Document> collection = mongoTemplate.getCollection("users");
+        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+                new Document("$unwind", "$skins"),
+                new Document("$lookup", new Document("from", "chests")
+                        .append("let", new Document("skinId", "$skins.skin_id"))
+                        .append("pipeline", Arrays.asList(
+                                new Document("$unwind", "$skins"),
+                                new Document("$match", new Document("$expr", new Document("$eq", Arrays.asList("$skins._id", "$$skinId"))))
+                        ))
+                        .append("as", "chestSkins")),
+                new Document("$unwind", "$chestSkins"),
+                new Document("$group", new Document("_id", "$skins.skin_id")
+                        .append("count", new Document("$sum", 1))
+                        .append("totalSpent", new Document("$sum", "$chestSkins.price")))
+        ));
+
+        return convertDocumentsToJson(result);
+    }
+
+    private List<JsonObject> convertDocumentsToJson(Iterable<Document> documents) {
+        List<JsonObject> jsonObjects = new ArrayList<>();
+        for (Document doc : documents) {
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            doc.forEach((key, value) -> {
+                builder.add(key, String.valueOf(value));
+            });
+            jsonObjects.add(builder.build());
+        }
+        return jsonObjects;
+    }
+}
+```
+
+# Moduł `controller`
+
+## UserController.java
+
+### Opis: Kontroler REST dla zarządzania operacjami związanymi z użytkownikami. Oferuje endpointy do dodawania nowych użytkowników, dodawania skrzyń i skór do użytkowników oraz pobierania szczegółów użytkowników.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.model.User;
+import com.example.mdb_spring_boot.model.UserChest;
+import com.example.mdb_spring_boot.model.UserSkin;
+import com.example.mdb_spring_boot.service.UserService;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.json.JsonObject;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping
+    public User addUser(@RequestBody User user){
+        return userService.addUser(user);
+    }
+
+    @PostMapping("/{userId}/chests")
+    public User addChestToUser(@PathVariable String userId, @RequestBody UserChest chest) {
+        chest.setChestId(new ObjectId(chest.getChestId().toString()));
+        return userService.addChestToUser(userId, chest);
+    }
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/{userId}/skins")
+    public User addSkinToUser(@PathVariable String userId, @RequestBody UserSkin skin) {
+        return userService.addSkinToUser(userId, skin);
+    }
+
+    @PostMapping("/open-chest")
+    public User openChest(@RequestParam String userId, @RequestParam String chestId) {
+        return userService.openChest(userId, chestId);
+    }
+
+    @GetMapping("/all")
+    public List<JsonObject> getAllUsers() {
+        return userService.getAllUsers();
+    }
+}
+```
+
+## ChestController.java
+
+### Opis: Kontroler REST dla zarządzania operacjami związanymi ze skrzyniami. Oferuje endpointy do dodawania nowych skrzyń, dodawania skór do skrzyń oraz pobierania szczegółów skrzyń.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.model.Chest;
+import com.example.mdb_spring_boot.model.Skin;
+import com.example.mdb_spring_boot.service.ChestService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.json.JsonObject;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/chests")
+public class ChestController {
+    private final ChestService chestService;
+
+    @Autowired
+    public ChestController(ChestService chestService) {
+        this.chestService = chestService;
+    }
+
+    @PostMapping
+    public Chest addChest(@RequestBody Chest chest) {
+        return chestService.addChest(chest);
+    }
+
+    @PostMapping("/{chestId}/skins")
+    public Chest addSkinToChest(@PathVariable String chestId, @RequestBody Skin skin) {
+        return chestService.addSkinToChest(chestId, skin);
+    }
+
+    @GetMapping("/all")
+    public List<JsonObject> getAllChests() {
+        return chestService.getAllChests();
+    }
+
+    @GetMapping("/{chestId}")
+    public Chest getChestById(@PathVariable String chestId) {
+        return chestService.getChestById(chestId);
+    }
+}
+```
+
+## LogController.java
+
+### Opis: Kontroler REST do zarządzania logami. Oferuje endpointy do dodawania nowych logów oraz pobierania szczegółów logów.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.service.LogService;
+import com.example.mdb_spring_boot.model.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import javax.json.JsonObject;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/logs")
+public class LogController {
+    private final LogService logService;
+
+    @Autowired
+    public LogController(LogService logService) {
+        this.logService = logService;
+    }
+
+    @PostMapping
+    public Log addLog(@RequestBody Log log) {
+        return logService.addLog(log);
+    }
+
+    @GetMapping("/all")
+    public List<JsonObject> getAllLogs() {
+        return logService.getAllLogs();
+    }
+
+    @GetMapping("/print")
+    public List<JsonObject> printLogs() {
+        return logService.getAllLogs();
+    }
+
+    @GetMapping("/{id}")
+    public Log getLogById(@PathVariable String id) {
+        return logService.getLogById(id);
+    }
+}
+```
+
+## ReportController.java
+
+### Opis: Kontroler REST do zarządzania generowaniem raportów na podstawie danych z systemu.
+
+```java
+package com.example.mdb_spring_boot.controller;
+
+import com.example.mdb_spring_boot.service.ReportService;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.bson.Document;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.json.JsonObject;
+
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.json.JsonObject;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/reports")
+public class ReportController {
+    private final ReportService reportService;
+
+    @Autowired
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
+
+    @GetMapping("/users-total-skins-values")
+    public List<JsonObject> getUsersTotalSkinsValues() {
+        return reportService.generateUsersTotalSkinsValues();
+    }
+
+    @GetMapping("/user-total-spending/{userId}")
+    public List<JsonObject> getUserTotalSpending(@PathVariable String userId) {
+        return reportService.generateUserTotalSpending(new ObjectId(userId));
+    }
+
+    @GetMapping("/skin-report")
+    public List<JsonObject> getSkinReport() {
+        return reportService.generateSkinReport();
+    }
+}
+```
+
+# Moduł `config`
+
+## CorsConfig.java
+
+### Opis: Klasa konfiguracyjna do ustawiania zasad CORS (Cross-Origin Resource Sharing). Umożliwia kontrolowanie, które źródła mogą uzyskiwać dostęp do zasobów API.
+
+```java
+package com.example.mdb_spring_boot.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**") // Adjust the mapping as needed
+                        .allowedOrigins("http://localhost:3000") // Allow requests from this origin
+                        .allowedMethods("GET", "POST", "PUT", "DELETE"); // Allow these HTTP methods
+            }
+        };
+    }
+}
+```
+
+# Moduł `exception`
+
+## InsufficientFundsException.java
+
+### Opis: Niestandardowy wyjątek sygnalizujący brak wystarczających środków na koncie użytkownika do wykonania określonej operacji.
+
+```java
+package com.example.mdb_spring_boot.exception;
+
+public class InsufficientFundsException extends RuntimeException {
+    public InsufficientFundsException(String message) {
+        super(message);
+    }
+}
+```
+
+# Moduł `util`
+
+## DrawingMachine.java
+
+### Opis: Narzędzie do losowania skórek z otwieranych skrzynek. 
+
+```java
+package com.example.mdb_spring_boot.util;
+
+import com.example.mdb_spring_boot.model.Chest;
+import com.example.mdb_spring_boot.model.Skin;
+import com.example.mdb_spring_boot.model.UserSkin;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Random;
+
+public class DrawingMachine {
+    private double totalWeights;
+    private final Random random;
+
+    public DrawingMachine(){
+        this.totalWeights = 0.0;
+        this.random = new Random();
+    }
+
+    public UserSkin getRandomSkin(Chest chest){
+        this.getTotalWeights(chest.getSkins());
+
+        double randomNumber = random.nextDouble() * totalWeights;
+
+        UserSkin randomSkin = null;
+
+        double sum = 0.0;
+        for (Skin skin : chest.getSkins()){
+            sum += skin.getOdds();
+            if (randomNumber < sum) {
+                double wear = this.random.nextDouble();
+                int pattern = this.random.nextInt(999) + 1;
+                double price = BigDecimal.valueOf(skin.getBasePrice() / Math.max(wear, 0.05) + pattern / 10.0)
+                        .setScale(2, RoundingMode.HALF_UP).doubleValue();
+
+                randomSkin = new UserSkin(
+                        skin.getName(),
+                        skin.getType(),
+                        wear,
+                        pattern,
+                        price,
+                        skin.getId()
+                );
+                break;
+            }
+        }
+
+        return randomSkin;
+    }
+
+    private void getTotalWeights(List<Skin> skins){
+        this.totalWeights = 0.0;
+        for (Skin skin : skins)
+            totalWeights += skin.getOdds();
+    }
+}
+```
+
+# Testy
+
+# Moduł `service`
+
+## UserServiceTest.java
+
+### Opis: Klasa testująca operacje na bazie danych.
+
+```java
+package com.example.mdb_spring_boot.service;
+
+import com.example.mdb_spring_boot.model.User;
+import com.example.mdb_spring_boot.repository.UserRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+public class UserServiceTest {
+    @Autowired
+    private UserService userService;
+
+    @Test
+    public void testAddUserValid() {
+        User user = new User("Name", "Surname", "test@example.pl", 100);
+
+        User savedUser = userService.addUser(user);
+
+        assertNotNull(savedUser);
+        assertEquals(user.getName(), savedUser.getName());
+        assertEquals(user.getSurname(), savedUser.getSurname());
+        assertEquals(user.getEmail(), savedUser.getEmail());
+
+        userService.removeUser(user);
+    }
+
+    @Test
+    public void testAddUserError(){
+        User user = new User("Name", "Surname", "testexample.pl", 100);
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            userService.addUser(user);
+        });
+    }
+}
+```
+
+# Zagadnienie współdostępu do bazy danych
+
+### MongoDB zapewnia wbudowaną ochronę przed jednoczesnym dostępem do dokumentów poprzez:
+1. Blokady na poziomie dokumentu: Zapewniają, że pojedynczy dokument jest modyfikowany przez jedną operację naraz, minimalizując ryzyko konfliktów.
+2. Atomowe operacje na dokumencie: Wszystkie zmiany na jednym dokumencie są przeprowadzane jako jedna, niepodzielna jednostka.
+3. Transakcje wielodokumentowe: Od wersji 4.0 MongoDB obsługuje transakcje, które pozwalają na grupowanie wielu operacji w jedną, atomową jednostkę, zapewniając integralność danych w różnych dokumentach i kolekcjach.
+
+Źródło: https://www.mongodb.com/docs/manual/faq/concurrency/#faq-concurrency
+
+![](2024-06-02-16-40-55.png)
