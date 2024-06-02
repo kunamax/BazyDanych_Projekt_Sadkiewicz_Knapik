@@ -25,19 +25,10 @@ public class ReportService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public Iterable<Document> generateSkinReportAfterDate(String date) {
+    public Iterable<Document> generateSkinReport() {
         AggregateIterable<Document> result = mongoTemplate.getCollection("users").aggregate(Arrays.asList(
                 // Rozwinięcie listy skinów
                 new Document("$unwind", "$skins"),
-                // Połączenie logów z odpowiadającymi im skinami na podstawie ID skina
-                new Document("$lookup", new Document("from", "logs")
-                        .append("let", new Document("skinId", "$skins._id"))
-                        .append("pipeline", Arrays.asList(
-                                new Document("$match", new Document("$expr", new Document("$eq", Arrays.asList("$details.skin_opened_id", "$$skinId"))))
-                        ))
-                        .append("as", "logs")
-                ),
-                new Document("$match", new Document("logs.type", "CHEST_OPEN").append("logs.date", new Document("$gte", date))),
                 new Document("$lookup", new Document("from", "chests")
                         .append("let", new Document("skinId", "$skins.skin_id"))
                         .append("pipeline", Arrays.asList(

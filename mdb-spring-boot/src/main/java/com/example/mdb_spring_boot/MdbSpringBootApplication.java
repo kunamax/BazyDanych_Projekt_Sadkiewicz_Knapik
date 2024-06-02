@@ -114,7 +114,11 @@ public class MdbSpringBootApplication {
 //		}
 //		System.out.println(results);
 
-		Iterable<Document> report = application.reportService.generateSkinReportAfterDate("Sun Jun 02 14:42:00 CEST 2024");
+		Iterable<Document> report = application.reportService.generateSkinReport();
+
+		application.userRepository.findAll().stream()
+				.map(User::getId)
+				.forEach(System.out::println);
 	}
 
 	public void testDatabaseConnection() {
