@@ -77,4 +77,9 @@ public class LogService {
             throw new RuntimeException("Log not found");
         }
     }
+
+    public List<Log> getLogsByUserId(String userId){
+        List<Log> logs = logRepository.findAll();
+        return logs.stream().filter(l -> l.getUserId().toString().equals(userId)).collect(Collectors.toList());
+    }
 }
