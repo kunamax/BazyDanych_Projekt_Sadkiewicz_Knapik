@@ -135,14 +135,21 @@ const ChestSchema = {
           required: [
             '_id',
             'name',
+            'type',
             'rarity',
-            'odds'
+            'odds',
+            'base_price'
           ],
           properties: {
             _id: {
               bsonType: 'objectId'
             },
             name: {
+              bsonType: 'string',
+              description: 'Must be a string',
+              pattern: '^.{0,100}$'
+            },
+            type: {
               bsonType: 'string',
               description: 'Must be a string',
               pattern: '^.{0,100}$'
@@ -156,6 +163,10 @@ const ChestSchema = {
               bsonType: 'double',
               minimum: 0,
               maximum: 1
+            },
+            base_price: {
+              bsonType: 'double',
+              minimum: 0
             }
           }
         }
@@ -197,6 +208,7 @@ const LogSchema = {
         bsonType: 'object',
         oneOf: [
           {
+            bsonType: 'object',
             properties: {
               chest_price: {
                 bsonType: 'double',
@@ -213,6 +225,7 @@ const LogSchema = {
             ]
           },
           {
+            bsonType: 'object',
             properties: {
               skin_opened_id: {
                 bsonType: 'objectId'
@@ -1877,8 +1890,10 @@ public class DrawingMachine {
 ```java
 package com.example.mdb_spring_boot.service;
 
-import com.example.mdb_spring_boot.model.User;
+import com.example.mdb_spring_boot.exception.InsufficientFundsException;
+import com.example.mdb_spring_boot.model.*;
 import com.example.mdb_spring_boot.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1888,12 +1903,20 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserServiceTest {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ChestService chestService;
+
+    @Autowired
+    private LogService logService;
 
     @Test
     public void testAddUserValid() {
@@ -1917,7 +1940,97 @@ public class UserServiceTest {
             userService.addUser(user);
         });
     }
+
+    private Chest createTestChest(){
+        Skin skin1 = new Skin("Name1", "Type1", "Rarity1", 0.5,100.0);
+        Skin skin2 = new Skin("Name2", "Type2", "Rarity2", 0.5,100.0);
+        return new Chest("ChestName", 100, List.of(skin1, skin2));
+    }
+
+    @Test
+    public void testAddChestToUserValid(){
+        // preparing test environment
+        User user = new User("Name", "Surname", "teste@xample.pl", 100);
+        User savedUser = userService.addUser(user);
+
+        Chest chest = createTestChest();
+        chestService.addChest(chest);
+
+        UserChest userChest = new UserChest(new ObjectId(chest.getId()), 1);
+
+        // adding chest to user
+        User updatedUser = userService.addChestToUser(savedUser.getId(), userChest);
+
+        // actual tests
+        List<UserChest> chestsList = updatedUser.getChests();
+        assertEquals(1, chestsList.size());
+        assertEquals(chest.getId(), chestsList.get(0).getChestId().toString());
+        assertEquals(userChest.getQuantity(), chestsList.get(0).getQuantity());
+
+        List<Log> logList = logService.getLogsByUserId(user.getId());
+        assertEquals(1, logList.size());
+
+        // cleaning test environment
+        userService.removeUser(user);
+        chestService.removeChest(chest);
+        logService.removeLog(logList.get(0));
+    }
+
+    @Test
+    public void testAddChestToUserError(){
+        // preparing test environment
+        User user = new User("Name", "Surname", "teste@xample.pl", 50);
+        User savedUser = userService.addUser(user);
+
+        Chest chest = createTestChest();
+        chestService.addChest(chest);
+
+        UserChest userChest = new UserChest(new ObjectId(chest.getId()), 1);
+
+        // adding chest to user
+        assertThrows(InsufficientFundsException.class, () -> {
+            userService.addChestToUser(savedUser.getId(), userChest);
+        });
+        userService.removeUser(user);
+        chestService.removeChest(chest);
+    }
+
+    @Test
+    public void testOpenChestToUserValid(){
+        // preparing test environment
+        User user = new User("Name", "Surname", "teste@xample.pl", 100);
+        User savedUser = userService.addUser(user);
+
+        Chest chest = createTestChest();
+        chestService.addChest(chest);
+
+        UserChest userChest = new UserChest(new ObjectId(chest.getId()), 1);
+
+        // adding chest to user
+        userService.addChestToUser(savedUser.getId(), userChest);
+
+        // opening chest
+        User updatedUser = userService.openChest(savedUser.getId(), chest.getId());
+
+        // actual tests
+        List<UserSkin> listUserSkin = updatedUser.getSkins();
+        assertEquals(1, listUserSkin.size());
+
+        List<Skin> skinList = chest.getSkins();
+
+        assertTrue(listUserSkin.get(0).getSkinId().equals(skinList.get(0).getId()) || listUserSkin.get(0).getSkinId().equals(skinList.get(1).getId()));
+
+        List<Log> logList = logService.getLogsByUserId(user.getId());
+        assertEquals(2, logList.size());
+
+        // cleaning test environment
+        userService.removeUser(user);
+        chestService.removeChest(chest);
+        logService.removeLog(logList.get(0));
+        logService.removeLog(logList.get(1));
+    }
 }
+
 ```
 
 # Zagadnienie współdostępu do bazy danych
@@ -1930,3 +2043,38 @@ public class UserServiceTest {
 Źródło: https://www.mongodb.com/docs/manual/faq/concurrency/#faq-concurrency
 
 ![](2024-06-02-16-40-55.png)
+
+## Wykorzystane technologie front-end
+
+Podczas projektowania front-end'u na potrzeby naszego projektu zdecydowaliśmy się na framework React do języka JavaScript. Wybraliśmy go głownie z uwagi na duzą swobodę działania jak i pewne nasze doświadczenie w tej technologii oraz łatwość łączenia właśnie front-end'u z back-end'em.
+
+![](2024-06-03-00-10-16.png)
+
+![](2024-06-03-00-10-41.png)
+
+![](2024-06-03-00-11-00.png)
+
+![](2024-06-03-00-11-22.png)
+
+
+# Wnioski
+
+### Chcielibyśmy zwrócić uwagę na trudności i wyzwania, które nam towarzszyły w trakcie tego projektu
+
+1. Konwersja ObjectId na String
+
+Problem: Dane ObjectId w MongoDB były konwertowane na złożone obiekty zawierające timestamp i inne metadane, co powodowało trudności w przesyłaniu i wyświetlaniu tych danych na froncie.
+
+Rozwiązanie: Implementacja dodatkowych metod na backendzie do konwersji ObjectId na prostsze formaty string przed wysłaniem ich do frontendu. To zapewniło, że dane były wyświetlane poprawnie i w łatwym do odczytania formacie.
+
+2. Błędy związane z zapytaniami MongoDB
+
+Problem: Podczas pisania zapytań MongoDB napotkaliśmy na błędy takie jak The field 'name' must be an accumulator object. Te błędy często wynikały z nieprawidłowego użycia operatorów agregacyjnych.
+
+Rozwiązanie: Wymagało to dogłębnej analizy dokumentacji oraz konsultacji z zespołem, aby zrozumieć, jakie są oczekiwane struktury danych dla operatorów agregacyjnych i jak je poprawnie stosować.
+
+3. Obsługa różnorodnych typów danych w logach
+
+Problem: Logi w systemie zawierały różnorodne typy danych, co powodowało trudności w ich jednolitym przetwarzaniu i wyświetlaniu.
+
+Rozwiązanie: Implementacja polimorficznego podejścia do obsługi różnych typów logów (np. CHEST_PURCHASE, CHEST_OPEN) na backendzie oraz dynamiczne renderowanie tych danych na froncie. Wymagało to dokładnego zaplanowania i przetestowania różnych scenariuszy danych.
