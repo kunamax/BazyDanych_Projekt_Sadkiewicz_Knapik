@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import javax.json.JsonObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -116,7 +117,7 @@ public class MdbSpringBootApplication {
 
 //		Iterable<Document> report = application.reportService.generateSkinReport();
 
-		Iterable<Document> report = application.reportService.generateUserTotalSpending(new ObjectId("665c683cc712a74959044421"));
+		Iterable<JsonObject> report = application.reportService.generateUserTotalSpending(new ObjectId("665c683cc712a74959044421"));
 //		Iterable<Document> report = application.reportService.generateUsersTotalSkinsValues();
 
 //		application.userRepository.findAll().stream()
