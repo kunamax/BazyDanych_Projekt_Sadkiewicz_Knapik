@@ -5,18 +5,22 @@ import com.example.mdb_spring_boot.repository.ChestRepository;
 import com.example.mdb_spring_boot.repository.LogRepository;
 import com.example.mdb_spring_boot.repository.UserRepository;
 
+import com.example.mdb_spring_boot.service.ReportService;
 import com.example.mdb_spring_boot.service.UserService;
 import com.example.mdb_spring_boot.service.ChestService;
 import com.example.mdb_spring_boot.service.LogService;
 import com.example.mdb_spring_boot.util.DrawingMachine;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,16 +35,18 @@ public class MdbSpringBootApplication {
 	private UserService userService;
     private ChestService chestService;
     private LogService logService;
+	private ReportService reportService;
 
 	@Autowired
 	public MdbSpringBootApplication(UserRepository userRepository, ChestRepository chestRepository, LogRepository logRepository,
-                                    UserService userService, ChestService chestService, LogService logService) {
+                                    UserService userService, ChestService chestService, LogService logService, ReportService reportService) {
 		this.userRepository = userRepository;
 		this.chestRepository = chestRepository;
         this.logRepository = logRepository;
 		this.userService = userService;
         this.chestService = chestService;
         this.logService = logService;
+		this.reportService = reportService;
 	}
 
 	public static void main(String[] args) {
@@ -107,6 +113,8 @@ public class MdbSpringBootApplication {
 //			results.put(userSkin.getName(), results.get(userSkin.getName()) + 1);
 //		}
 //		System.out.println(results);
+
+		Iterable<Document> report = application.reportService.generateSkinReportAfterDate("Sun Jun 02 14:42:00 CEST 2024");
 	}
 
 	public void testDatabaseConnection() {

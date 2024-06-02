@@ -100,7 +100,7 @@ public class UserService {
                     user.addSkin(skin);
 
                     // Tworzymy log otwierania skrzynki
-                    Detail detail = new DetailOpen(skin.getSkinId(), "Opened skin");
+                    Detail detail = new DetailOpen(skin.getId(), "Opened skin");
                     Log log = new Log(LogType.CHEST_OPEN, new ObjectId(userId), new Date().toString(), new ObjectId(chestId), detail);
                     logRepository.save(log);
 
