@@ -19,7 +19,7 @@ public class ReportController {
 
     @GetMapping("/skinType")
     public Iterable<Document> generateSkinTypeReport() {
-        Iterable<Document> report = reportService.generateSkinReportAfterDate("Sun Jun 02 14:41:00 CEST 2024");
+        Iterable<Document> report = reportService.generateSkinReport();
         return report;
     }
 }
