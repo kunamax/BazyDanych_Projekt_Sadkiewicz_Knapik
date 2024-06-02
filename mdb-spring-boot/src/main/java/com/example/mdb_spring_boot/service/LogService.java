@@ -24,6 +24,7 @@ public class LogService {
     }
 
     public List<Log> getAllLogs() {
+        System.out.println("Getting all logs");
         return logRepository.findAll();
     }
 

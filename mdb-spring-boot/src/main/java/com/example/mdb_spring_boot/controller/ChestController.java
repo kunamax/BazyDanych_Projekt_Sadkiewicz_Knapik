@@ -28,7 +28,7 @@ public class ChestController {
         return chestService.addSkinToChest(chestId, skin);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Chest> getAllChests() {
         return chestService.getAllChests();
     }

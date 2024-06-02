@@ -27,7 +27,7 @@ public class LogController {
         return logService.addLog(log);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Log> getAllLogs() {
         return logService.getAllLogs();
     }

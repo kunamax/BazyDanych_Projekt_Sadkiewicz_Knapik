@@ -1,40 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function LogList() {
     const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('/api/logs')
-            .then(response => {
+        const fetchLogs = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/api/logs/all');
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Failed to fetch logs');
                 }
-                return response.json();
-            })
-            .then(data => setLogs(data))
-            .catch(error => setError(error.message));
+                const data = await response.json();
+                setLogs(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLogs();
     }, []);
 
+    if (loading) {
+        return <p>Loading logs...</p>;
+    }
+
     if (error) {
-        return <div>Error: {error}</div>;
+        return <p className="error">{error}</p>;
     }
 
     return (
         <div>
-            <h2>Logs</h2>
+            <h2>Log List</h2>
             <ul>
                 {logs.map(log => (
-                    <li key={log._id}>
-                        {log.type} - User: {log.user_id} - Date: {log.date}
-                        <ul>
-                            {log.details.chest_price && (
-                                <li>Chest Price: {log.details.chest_price} - Quantity: {log.details.quantity}</li>
+                    <li key={log.id}>
+                        <p>Type: {log.type} - User: {log.userId} - Date: {log.date}</p>
+                        <div>
+                            <h4>Details:</h4>
+                            {log.type === 'CHEST_PURCHASE' && log.details && (
+                                <ul>
+                                    <li>Chest Price: {log.details.chestPrice}</li>
+                                    <li>Quantity: {log.details.quantity}</li>
+                                    <li>Description: {log.details.description}</li>
+                                </ul>
                             )}
-                            {log.details.skin_opened_id && (
-                                <li>Skin Opened ID: {log.details.skin_opened_id}</li>
+                            {log.type === 'CHEST_OPEN' && log.details && (
+                                <ul>
+                                    <li>Skin Opened ID: {log.details.skinOpenedId}</li>
+                                    <li>Description: {log.details.description}</li>
+                                </ul>
                             )}
-                        </ul>
+                        </div>
                     </li>
                 ))}
             </ul>
