@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonObject;
 import java.util.List;
 
 @RestController
@@ -42,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public List<User> getAllUsers() {
+    public List<JsonObject> getAllUsers() {
         return userService.getAllUsers();
     }
 }

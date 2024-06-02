@@ -13,8 +13,10 @@ function LogList() {
                     throw new Error('Failed to fetch logs');
                 }
                 const data = await response.json();
+                console.log('Fetched logs:', data); // Logowanie danych
                 setLogs(data);
             } catch (error) {
+                console.error('Error fetching logs:', error); // Logowanie błędów
                 setError(error.message);
             } finally {
                 setLoading(false);
@@ -37,21 +39,21 @@ function LogList() {
             <h2>Log List</h2>
             <ul>
                 {logs.map(log => (
-                    <li key={log.id}>
-                        <p>Type: {log.type} - User: {log.userId} - Date: {log.date}</p>
+                    <li key={log.id.chars}>
+                        <inf>Type: {log.type.chars} - User: {log.userId.chars} - Date: {log.date.chars} - Chest ID: {log.chestId.chars}</inf>
                         <div>
                             <h4>Details:</h4>
-                            {log.type === 'CHEST_PURCHASE' && log.details && (
+                            {log.type.chars === 'CHEST_PURCHASE' && log.details && (
                                 <ul>
-                                    <li>Chest Price: {log.details.chestPrice}</li>
-                                    <li>Quantity: {log.details.quantity}</li>
-                                    <li>Description: {log.details.description}</li>
+                                    <li>Chest Price: {log.details.chestPrice.chars}</li>
+                                    <li>Quantity: {log.details.quantity.chars}</li>
+                                    <li>Description: {log.details.description.chars}</li>
                                 </ul>
                             )}
-                            {log.type === 'CHEST_OPEN' && log.details && (
+                            {log.type.chars === 'CHEST_OPEN' && log.details && (
                                 <ul>
-                                    <li>Skin Opened ID: {log.details.skinOpenedId}</li>
-                                    <li>Description: {log.details.description}</li>
+                                    <li>Skin Opened ID: {log.details.skinOpenedId.chars}</li>
+                                    <li>Description: {log.details.description.chars}</li>
                                 </ul>
                             )}
                         </div>

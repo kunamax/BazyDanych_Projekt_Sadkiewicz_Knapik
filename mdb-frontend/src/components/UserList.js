@@ -37,21 +37,21 @@ function UserList() {
             <h2>User List</h2>
             <ul>
                 {users.map(user => (
-                    <li key={user.id}>
-                        <inf>{user.name} {user.surname} - {user.email}</inf>
-                        <inf>Deposit: {user.deposit}</inf>
+                    <li key={user.id.chars.chars}>
+                        <inf>{user.name.chars} {user.surname.chars} - {user.email.chars}</inf>
+                        <inf>Deposit: {user.deposit.chars.chars}</inf>
                         <div>
                             <h4>Chests:</h4>
                             {user.chests && user.chests.length > 0 ? (
                                 <ul>
                                     {user.chests.map(chest => (
-                                        <li key={chest.chestId.toString()}>
-                                            Chest ID: {chest.chestId.toString()} (Quantity: {chest.quantity})
+                                        <li key={chest.chestId.chars.chars}>
+                                            Chest ID: {chest.chestId.chars.chars} (Quantity: {chest.quantity.chars.chars})
                                         </li>
                                     ))}
                                 </ul>
                             ) : (
-                                <info_no>No chests</info_no>
+                                <inf_no>No chests</inf_no>
                             )}
                         </div>
                         <div>
@@ -59,8 +59,8 @@ function UserList() {
                             {user.skins && user.skins.length > 0 ? (
                                 <ul>
                                     {user.skins.map(skin => (
-                                        <li key={skin.id.toString()}>
-                                            Name: {skin.name}, Type: {skin.type}, Price: {skin.price}
+                                        <li key={skin.skinId.chars.chars}>
+                                            Name: {skin.name.chars}, Type: {skin.type.chars}, Price: {skin.price.chars.chars}
                                         </li>
                                     ))}
                                 </ul>

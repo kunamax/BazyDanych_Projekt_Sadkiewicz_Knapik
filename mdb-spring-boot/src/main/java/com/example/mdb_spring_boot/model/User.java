@@ -92,4 +92,8 @@ public class User {
     public List<UserChest> getChests(){
         return chests;
     }
+
+    public List<UserSkin> getSkins() {
+        return skins;
+    }
 }

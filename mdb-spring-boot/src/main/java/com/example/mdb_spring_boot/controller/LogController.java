@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.json.JsonObject;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,12 @@ public class LogController {
     }
 
     @GetMapping("/all")
-    public List<Log> getAllLogs() {
+    public List<JsonObject> getAllLogs() {
+        return logService.getAllLogs();
+    }
+
+    @GetMapping("/print")
+    public List<JsonObject> printLogs() {
         return logService.getAllLogs();
     }
 

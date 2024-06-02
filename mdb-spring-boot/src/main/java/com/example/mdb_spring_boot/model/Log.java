@@ -21,6 +21,8 @@ public class Log {
     private ObjectId chestId;
     private Detail details;
 
+    public Log(){}
+
     public Log(LogType type, ObjectId userId, String date, ObjectId chestId, Detail detail){
         this.type = type;
         this.userId = userId;

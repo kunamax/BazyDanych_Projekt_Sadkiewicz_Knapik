@@ -9,10 +9,17 @@ import com.example.mdb_spring_boot.util.DrawingMachine;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonArrayBuilder;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -33,6 +40,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User addChestToUser(String userId, UserChest userChest) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
@@ -78,6 +86,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public User openChest(String userId, String chestId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
@@ -129,7 +138,43 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<JsonObject> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::convertUserToJson)
+                .collect(Collectors.toList());
+    }
+
+    private JsonObject convertUserToJson(User user) {
+        JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+        jsonBuilder.add("id", Json.createObjectBuilder().add("chars", user.getId()).add("string", user.getId()).add("valueType", "STRING"));
+        jsonBuilder.add("name", user.getName());
+        jsonBuilder.add("surname", user.getSurname());
+        jsonBuilder.add("email", user.getEmail());
+        jsonBuilder.add("deposit", Json.createObjectBuilder().add("chars", String.valueOf(user.getDeposit())).add("string", String.valueOf(user.getDeposit())).add("valueType", "NUMBER"));
+
+        JsonArrayBuilder chestsBuilder = Json.createArrayBuilder();
+        user.getChests().forEach(chest -> {
+            JsonObjectBuilder chestBuilder = Json.createObjectBuilder();
+            chestBuilder.add("chestId", Json.createObjectBuilder().add("chars", chest.getChestId().toHexString()).add("string", chest.getChestId().toHexString()).add("valueType", "STRING"));
+            chestBuilder.add("quantity", Json.createObjectBuilder().add("chars", String.valueOf(chest.getQuantity())).add("string", String.valueOf(chest.getQuantity())).add("valueType", "NUMBER"));
+            chestsBuilder.add(chestBuilder);
+        });
+        jsonBuilder.add("chests", chestsBuilder);
+
+        JsonArrayBuilder skinsBuilder = Json.createArrayBuilder();
+        user.getSkins().forEach(skin -> {
+            JsonObjectBuilder skinBuilder = Json.createObjectBuilder();
+            skinBuilder.add("skinId", Json.createObjectBuilder().add("chars", skin.getSkinId().toHexString()).add("string", skin.getSkinId().toHexString()).add("valueType", "STRING"));
+            skinBuilder.add("name", skin.getName());
+            skinBuilder.add("type", skin.getType());
+            skinBuilder.add("wear", Json.createObjectBuilder().add("chars", String.valueOf(skin.getWear())).add("string", String.valueOf(skin.getWear())).add("valueType", "NUMBER"));
+            skinBuilder.add("pattern", Json.createObjectBuilder().add("chars", String.valueOf(skin.getPattern())).add("string", String.valueOf(skin.getPattern())).add("valueType", "NUMBER"));
+            skinBuilder.add("price", Json.createObjectBuilder().add("chars", String.valueOf(skin.getPrice())).add("string", String.valueOf(skin.getPrice())).add("valueType", "NUMBER"));
+            skinsBuilder.add(skinBuilder);
+        });
+        jsonBuilder.add("skins", skinsBuilder);
+
+        return jsonBuilder.build();
     }
 }
