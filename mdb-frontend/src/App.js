@@ -6,6 +6,7 @@ import OpenChest from './components/OpenChest';
 import UserList from './components/UserList';
 import ChestList from './components/ChestList';
 import LogList from './components/LogList';
+import ReportList from './components/ReportList';
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -18,6 +19,8 @@ function App() {
                 return <ChestList />;
             case 'logs':
                 return <LogList />;
+            case 'reports':
+                return <ReportList />;
             default:
                 return (
                     <div>
@@ -38,6 +41,7 @@ function App() {
                 <button onClick={() => setCurrentPage('users')}>User List</button>
                 <button onClick={() => setCurrentPage('chests')}>Chest List</button>
                 <button onClick={() => setCurrentPage('logs')}>Log List</button>
+                <button onClick={() => setCurrentPage('reports')}>Report List</button>
             </nav>
             {renderPage()}
         </div>
