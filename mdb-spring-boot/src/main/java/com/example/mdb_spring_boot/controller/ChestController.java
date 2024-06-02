@@ -6,6 +6,7 @@ import com.example.mdb_spring_boot.service.ChestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonObject;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,7 @@ public class ChestController {
     }
 
     @GetMapping("/all")
-    public List<Chest> getAllChests() {
+    public List<JsonObject> getAllChests() {
         return chestService.getAllChests();
     }
 

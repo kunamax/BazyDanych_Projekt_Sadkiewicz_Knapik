@@ -37,20 +37,20 @@ function ChestList() {
             <h2>Chest List</h2>
             <ul>
                 {chests.map(chest => (
-                    <li key={chest.id}>
-                        <inf>{chest.name} - Price: {chest.price}</inf>
+                    <li key={chest.id.chars.chars}>
+                        <inf>{chest.name.chars} - Price: {chest.price.chars}</inf>
                         <div>
                             <h4>Skins:</h4>
                             {chest.skins && chest.skins.length > 0 ? (
                                 <ul>
                                     {chest.skins.map(skin => (
-                                        <li key={skin.id.toString()}>
-                                            Name: {skin.name}, Rarity: {skin.rarity}, Odds: {skin.odds}
+                                        <li key={skin.name.chars}>
+                                            Name: {skin.name.chars}, Rarity: {skin.rarity.chars}, Odds: {skin.odds.chars.chars}
                                         </li>
                                     ))}
                                 </ul>
                             ) : (
-                                <inf_no>No skins</inf_no>
+                                <p>No skins</p>
                             )}
                         </div>
                     </li>
