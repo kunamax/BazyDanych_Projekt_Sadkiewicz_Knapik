@@ -31,19 +31,18 @@ public class DrawingMachine {
             if (randomNumber < sum) {
                 double wear = this.random.nextDouble();
                 int pattern = this.random.nextInt(999) + 1;
-                double price = BigDecimal.valueOf(100.0 / wear + pattern / 10.0)
+                double price = BigDecimal.valueOf(skin.getBasePrice() / Math.max(wear, 0.05) + pattern / 10.0)
                         .setScale(2, RoundingMode.HALF_UP).doubleValue();
 
-                // trzeba dodac do skinów wszystkich basePrice z którego potem mozna wyliczać adekwatną cenę imo
-                // poki co dalem 100.0, które jest po prostu stałą
                 randomSkin = new UserSkin(
                         skin.getName(),
-                        "Rifle", // ale nie mamy w klasie Skin typu, no chyba ze to tez losowe ma być
+                        skin.getType(),
                         wear,
                         pattern,
                         price,
                         skin.getId()
                 );
+                break;
             }
         }
 

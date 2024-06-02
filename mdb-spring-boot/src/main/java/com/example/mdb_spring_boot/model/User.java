@@ -33,7 +33,25 @@ public class User {
     }
 
     public void addChest(UserChest chest){
-        chests.add(chest);
+        for (UserChest ownedChest : this.chests) {
+            if (chest.getChestId().equals(ownedChest.getChestId())) {
+                ownedChest.setQuantity(ownedChest.getQuantity() + chest.getQuantity());
+                return;
+            }
+        }
+        this.chests.add(chest);
+    }
+
+    public void setDeposit(double deposit){
+        this.deposit = deposit;
+    }
+
+    public void addToDeposit(double money){
+        this.deposit += money;
+    }
+
+    public void removeFromDeposit(double money){
+        this.deposit -= money;
     }
 
     public void afterOpeningChest(UserChest chest){

@@ -4,7 +4,7 @@ function CreateChest() {
     const [chest, setChest] = useState({
         name: '',
         price: 0,
-        skins: [{ name: '', rarity: '', odds: 0 }]
+        skins: [{ name: '', type: '', rarity: '', odds: 0, basePrice: 0 }]
     });
     const [message, setMessage] = useState('');
 
@@ -22,7 +22,7 @@ function CreateChest() {
     };
 
     const addSkinField = () => {
-        setChest({ ...chest, skins: [...chest.skins, { name: '', rarity: '', odds: 0 }] });
+        setChest({ ...chest, skins: [...chest.skins, { name: '', type: '', rarity: '', odds: 0, basePrice: 0 }] });
     };
 
     const handleSubmit = async (e) => {
@@ -76,6 +76,13 @@ function CreateChest() {
                         />
                         <input
                             type="text"
+                            name="type"
+                            placeholder="Skin Type"
+                            value={skin.type}
+                            onChange={(e) => handleSkinChange(index, e)}
+                        />
+                        <input
+                            type="text"
                             name="rarity"
                             placeholder="Skin Rarity"
                             value={skin.rarity}
@@ -86,6 +93,13 @@ function CreateChest() {
                             name="odds"
                             placeholder="Skin Odds"
                             value={skin.odds}
+                            onChange={(e) => handleSkinChange(index, e)}
+                        />
+                        <input
+                            type="number"
+                            name="basePrice"
+                            placeholder="Skin Base Price"
+                            value={skin.basePrice}
                             onChange={(e) => handleSkinChange(index, e)}
                         />
                     </div>

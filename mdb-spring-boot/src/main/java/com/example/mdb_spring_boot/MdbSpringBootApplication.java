@@ -8,6 +8,7 @@ import com.example.mdb_spring_boot.repository.UserRepository;
 import com.example.mdb_spring_boot.service.UserService;
 import com.example.mdb_spring_boot.service.ChestService;
 import com.example.mdb_spring_boot.service.LogService;
+import com.example.mdb_spring_boot.util.DrawingMachine;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,6 +95,18 @@ public class MdbSpringBootApplication {
 //
 //		user = application.userService.addSkinToUser(user.getId(), skin);
 //		user = application.userService.addChestToUser(user.getId(), chest);
+
+//		DrawingMachine drawingMachine = new DrawingMachine();
+//		Chest chest = application.chestService.getChestById("665c3577609aef3d97e50887");
+//		HashMap<String, Integer> results = new HashMap<>();
+//		results.put("PogSkin1", 0);
+//		results.put("PogSkin2", 0);
+//		results.put("PogSkin3", 0);
+//		for (int i=0; i<1000; i++) {
+//			UserSkin userSkin = drawingMachine.getRandomSkin(chest);
+//			results.put(userSkin.getName(), results.get(userSkin.getName()) + 1);
+//		}
+//		System.out.println(results);
 	}
 
 	public void testDatabaseConnection() {

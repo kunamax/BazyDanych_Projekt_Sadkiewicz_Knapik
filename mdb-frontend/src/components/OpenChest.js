@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 function OpenChest() {
     const [data, setData] = useState({
         userId: '',
-        chestId: '',
-        skinOpenedId: ''
+        chestId: ''
     });
     const [message, setMessage] = useState('');
 
@@ -22,8 +21,7 @@ function OpenChest() {
                 },
                 body: new URLSearchParams({
                     userId: data.userId,
-                    chestId: data.chestId,
-                    skinId: data.skinOpenedId
+                    chestId: data.chestId
                 })
             });
 
@@ -54,13 +52,6 @@ function OpenChest() {
                     name="chestId"
                     placeholder="Chest ID"
                     value={data.chestId}
-                    onChange={handleChange}
-                />
-                <input
-                    type="text"
-                    name="skinOpenedId"
-                    placeholder="Skin Opened ID"
-                    value={data.skinOpenedId}
                     onChange={handleChange}
                 />
                 <button type="submit">Open Chest</button>

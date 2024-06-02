@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/open-chest")
-    public User openChest(@RequestParam String userId, @RequestParam String chestId, @RequestParam String skinId) {
-        return userService.openChest(userId, chestId, skinId);
+    public User openChest(@RequestParam String userId, @RequestParam String chestId) {
+        return userService.openChest(userId, chestId);
     }
 }

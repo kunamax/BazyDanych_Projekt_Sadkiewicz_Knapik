@@ -1,5 +1,6 @@
 package com.example.mdb_spring_boot.service;
 
+import com.example.mdb_spring_boot.exception.InsufficientFundsException;
 import com.example.mdb_spring_boot.model.*;
 import com.example.mdb_spring_boot.repository.ChestRepository;
 import com.example.mdb_spring_boot.repository.LogRepository;
@@ -32,17 +33,35 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User addChestToUser(String userId, UserChest chest) {
+    public User addChestToUser(String userId, UserChest userChest) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            user.addChest(chest);
 
-            Detail detail = new DetailPurchase(100, chest.getQuantity(), "Chest purchase");
-            Log log = new Log(LogType.CHEST_PURCHASE, new ObjectId(userId), new Date().toString(), chest.getChestId(), detail);
-            logRepository.save(log);
+            Optional<Chest> optionalChest = chestRepository.findAll().stream()
+                    .filter(c -> c.getId().equals(userChest.getChestId().toString()))
+                    .findFirst();
 
-            return userRepository.save(user);
+            if (optionalChest.isPresent()) {
+                Chest chest = optionalChest.get();
+                double totalPrice = userChest.getQuantity() * chest.getPrice();
+                if (user.getDeposit() > totalPrice) {
+                    user.addChest(userChest);
+                    user.removeFromDeposit(totalPrice);
+
+                    Detail detail = new DetailPurchase(chest.getPrice(), userChest.getQuantity(), "Chest purchase");
+                    Log log = new Log(LogType.CHEST_PURCHASE, new ObjectId(userId), new Date().toString(), userChest.getChestId(), detail);
+                    logRepository.save(log);
+
+                    return userRepository.save(user);
+                }
+                else{
+                    throw new InsufficientFundsException("User does not have enough money to buy chest or chests");
+                }
+            }
+            else {
+                throw new RuntimeException("Chest does not exist");
+            }
         } else {
             throw new RuntimeException("User not found");
         }
@@ -59,7 +78,7 @@ public class UserService {
         }
     }
 
-    public User openChest(String userId, String chestId, String skinId) {
+    public User openChest(String userId, String chestId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -93,15 +112,6 @@ public class UserService {
                 else{
                     throw new RuntimeException("Chest does not exist");
                 }
-                // Tworzymy nową skórkę i dodajemy ją do użytkownika
-//                UserSkin skin = new UserSkin(
-//                        "M4A1-S | Hyper Beast",
-//                        "Rifle",
-//                        0.10,
-//                        45,
-//                        300.00,
-//                        new ObjectId(skinId)
-//                );
             } else {
                 throw new RuntimeException("Chest not found for user");
             }
