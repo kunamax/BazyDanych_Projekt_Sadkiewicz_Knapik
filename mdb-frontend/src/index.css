@@ -39,3 +39,40 @@ p {
 p.error {
     background-color: #dc3545;
 }
+
+inf {
+    padding: 10px;
+    color: white;
+    background-color: #0055ff;
+    border-radius: 5px;
+}
+
+inf_no {
+    padding: 10px;
+    color: white;
+    background-color: #ffff55;
+    border-radius: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+li ul {
+    margin-top: 10px;
+}
+
+li ul li {
+    background-color: #f4f4f4;
+    border: none;
+    padding: 5px;
+}

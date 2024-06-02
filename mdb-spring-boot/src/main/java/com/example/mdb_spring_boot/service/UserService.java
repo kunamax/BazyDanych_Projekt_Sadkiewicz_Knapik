@@ -45,7 +45,7 @@ public class UserService {
             if (optionalChest.isPresent()) {
                 Chest chest = optionalChest.get();
                 double totalPrice = userChest.getQuantity() * chest.getPrice();
-                if (user.getDeposit() > totalPrice) {
+                if (user.getDeposit() >= totalPrice) {
                     user.addChest(userChest);
                     user.removeFromDeposit(totalPrice);
 

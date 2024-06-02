@@ -6,6 +6,7 @@ function OpenChest() {
         chestId: ''
     });
     const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState(''); // success or error
 
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
@@ -30,9 +31,11 @@ function OpenChest() {
             }
 
             setMessage('Chest opened successfully!');
+            setMessageType('success');
         } catch (error) {
             console.error('Error opening chest:', error);
             setMessage('Error opening chest');
+            setMessageType('error');
         }
     };
 
@@ -56,7 +59,11 @@ function OpenChest() {
                 />
                 <button type="submit">Open Chest</button>
             </form>
-            {message && <p>{message}</p>}
+            {message && (
+                <p className={messageType === 'success' ? '' : 'error'}>
+                    {message}
+                </p>
+            )}
         </div>
     );
 }
