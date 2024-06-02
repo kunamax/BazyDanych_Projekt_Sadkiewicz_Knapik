@@ -26,6 +26,10 @@ public class ChestService {
         return chestRepository.save(chest);
     }
 
+    public void removeChest(Chest chest){
+        chestRepository.delete(chest);
+    }
+
     public Chest getChestById(String chestId){
         return chestRepository.findById(chestId).orElseThrow(() -> new RuntimeException("Chest not found"));
     }

@@ -32,6 +32,10 @@ public class LogService {
         return logRepository.save(log);
     }
 
+    public void removeLog(Log log){
+        logRepository.delete(log);
+    }
+
     public List<JsonObject> getAllLogs() {
         List<Log> logs = logRepository.findAll();
         return logs.stream()

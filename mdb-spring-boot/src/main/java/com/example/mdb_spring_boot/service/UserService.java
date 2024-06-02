@@ -40,6 +40,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void removeUser(User user){
+        userRepository.delete(user);
+    }
+
     @Transactional
     public User addChestToUser(String userId, UserChest userChest) {
         Optional<User> optionalUser = userRepository.findById(userId);
