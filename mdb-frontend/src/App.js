@@ -35,7 +35,7 @@ function App() {
 
     return (
         <div>
-            <h1>Frontend</h1>
+            <h1>Main Page</h1>
             <nav>
                 <button onClick={() => setCurrentPage('home')}>Home</button>
                 <button onClick={() => setCurrentPage('users')}>User List</button>
