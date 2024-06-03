@@ -4,13 +4,214 @@
 
 ## Temat projektu
 
-### Nasz projekt bazy danych został stworzony z myślą o przechowywaniu skórek i ich zdoobywaniu poprzez otwieranie specjalnych skrzynek w aplikacjach podobnych do popularnych gier, takich jak Counter-Strike: Global Offensive. Projekt ten ma na celu ułatwienie użytkownikom zarządzania swoimi zasobami, takimi jak skrzynie i skórki, a także śledzenie transakcji związanych z ich zakupem i otwieraniem.
+### Nasz projekt bazy danych został stworzony z myślą o przechowywaniu skórek i ich zdobywaniu poprzez otwieranie specjalnych skrzynek w aplikacjach podobnych do popularnych gier, takich jak Counter-Strike: Global Offensive. Projekt ten ma na celu ułatwienie użytkownikom zarządzania swoimi zasobami, takimi jak skrzynie i skórki, a także śledzenie transakcji związanych z ich zakupem i otwieraniem.
 
 ## Poglądowy schemat bazy danych
 
-![](2024-05-26-17-28-37.png)
+![](diagram_bazy.drawio.png)
+
+Ciężko przygotować faktyczny diagram bazy nierelacyjnej, dlatego posłużyliśmy się aplikacją drawio, aby przygotować przynajmniej poglądowe rozpisanie kolekcji i dokumentów.
+
+## Omówienie modelu danych
+Zdecydowaliśmy na trzy kolekcje: Users, Chests oraz Logs. Stosujemy przy nich mechanizm referencji, aby móc zaprezentować relację pomiędzy kolejno:
+
+* _id z kolekcji Users pokrywają się z user_id z kolekcji Logs
+* _id z listy Skins z kolekcji Users pokrywają się z skin_opened_id z Details vol. 2
+* _id z kolekcji Chests pokrywają się z chest_id z kolekcji Logs
+* _id z listy Skins z kolekcji Chests pokrywają się z skin_id w liście Skins w kolekcji Users
+
+Ogromną zaletą nierelacyjnej bazy danych jest możliwość zastosowania ciekawych obiektów w dokumentach. W naszym przypadku w kolekcji Logs trzymamy tak naprawdę dwa rodzaje dokumentów:
+
+* CHEST_PURCHASE
+* CHEST_OPEN
+
+Jedyne różnice między nimi to pole type, które posiada odpowiednią wartość string (generowaną na podstawie Enuma) oraz pole details, które może przechowywać obiekt zawierający pola:
+
+* chest_price i quantity
+
+Albo:
+
+* skin_opened_id 
+
+Dzięki temu w jednej kolekcji, możemy trzymać dwa podobnej budowy rodzaje dokumentów, bez konieczności tworzenia jakiś referencji do uzupełniających tabel.
+
+Zyskujemy dzięki temu na wydajności, elastyczności i prostocie.
+
+Kolejnym ciekawym rozwiązaniem jest przechowywanie listy skinów oraz listy skrzynek u użytkownika oraz jako osobnej kolekcji. To rozwiązanie pozwala na uniknięcie korzystania z mechanizmu referencji w niektórych przypadkach. Przykładowo użytkownik, często może chcieć wyświetlać listę skinów z Chests, lub swoje własne skiny z Users, a bardzo rzadko agregację tych dwóch kolekcji.
+
+## Przykładowe dokumenty z kolekcji
+
+### Przykładowy dokument z kolekcji Users
+
+```json
+{
+  "_id": {
+    "$oid": "665cfd7c4b58ee76868aca22"
+  },
+  "name": "Diana",
+  "surname": "Prince",
+  "email": "diana.prince@example.com",
+  "deposit": 6610,
+  "chests": [
+    {
+      "chest_id": {
+        "$oid": "665cff924b58ee76868aca27"
+      },
+      "quantity": 2
+    },
+    {
+      "chest_id": {
+        "$oid": "665d023f4b58ee76868aca2a"
+      },
+      "quantity": 3
+    },
+    {
+      "chest_id": {
+        "$oid": "665d034b4b58ee76868aca30"
+      },
+      "quantity": 5
+    }
+  ],
+  "skins": [
+    {
+      "_id": {
+        "$oid": "665d049e4b58ee76868aca63"
+      },
+      "name": "Fire Serpent",
+      "type": "AK-47",
+      "wear": 0.9473571186024513,
+      "pattern": 927,
+      "price": 198.26,
+      "skin_id": {
+        "$oid": "665cff924b58ee76868aca25"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "665d04a74b58ee76868aca71"
+      },
+      "name": "Mecha Industries",
+      "type": "M4A1-S",
+      "wear": 0.3466901528866344,
+      "pattern": 810,
+      "price": 470.4,
+      "skin_id": {
+        "$oid": "665d034b4b58ee76868aca2e"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "665d04af4b58ee76868aca80"
+      },
+      "name": "Cyrex",
+      "type": "M4A1-S",
+      "wear": 0.07337418194237144,
+      "pattern": 992,
+      "price": 1189.5,
+      "skin_id": {
+        "$oid": "665d023f4b58ee76868aca29"
+      }
+    }
+  ]
+}
+```
+
+### Przykładowy dokument z kolekcji Chests
+
+```json
+{
+  "_id": {
+    "$oid": "665cff924b58ee76868aca27"
+  },
+  "name": "Bravo Case",
+  "price": 30,
+  "skins": [
+    {
+      "_id": {
+        "$oid": "665cff924b58ee76868aca24"
+      },
+      "name": "Howl",
+      "type": "M4A4",
+      "rarity": "Covert",
+      "odds": 0.3,
+      "base_price": 200
+    },
+    {
+      "_id": {
+        "$oid": "665cff924b58ee76868aca25"
+      },
+      "name": "Fire Serpent",
+      "type": "AK-47",
+      "rarity": "Classified",
+      "odds": 0.5,
+      "base_price": 100
+    },
+    {
+      "_id": {
+        "$oid": "665cff924b58ee76868aca26"
+      },
+      "name": "Gamma Doppler",
+      "type": "Glock-18",
+      "rarity": "Covert",
+      "odds": 0.2,
+      "base_price": 250
+    }
+  ]
+}
+```
+
+### Przykładowy dokument z kolekcji Logs (Typu CHEST_PURCHASE)
+
+```json
+{
+  "_id": {
+    "$oid": "665d04594b58ee76868aca3f"
+  },
+  "type": "CHEST_PURCHASE",
+  "user_id": {
+    "$oid": "665cfd7c4b58ee76868aca22"
+  },
+  "date": "Mon Jun 03 01:46:33 CEST 2024",
+  "chest_id": {
+    "$oid": "665cff924b58ee76868aca27"
+  },
+  "details": {
+    "chest_price": 30,
+    "quantity": 3,
+    "description": "Chest purchase",
+    "_class": "com.example.mdb_spring_boot.model.DetailPurchase"
+  }
+}
+```
+
+### Przykładowy dokument z kolekcji Logs (Typu OPEN_CHEST)
+
+```json
+{
+  "_id": {
+    "$oid": "665d04a74b58ee76868aca72"
+  },
+  "type": "CHEST_OPEN",
+  "user_id": {
+    "$oid": "665cfd7c4b58ee76868aca22"
+  },
+  "date": "Mon Jun 03 01:47:51 CEST 2024",
+  "chest_id": {
+    "$oid": "665d034b4b58ee76868aca30"
+  },
+  "details": {
+    "skin_opened_id": {
+      "$oid": "665d04a74b58ee76868aca71"
+    },
+    "description": "Opened skin",
+    "_class": "com.example.mdb_spring_boot.model.DetailOpen"
+  }
+}
+```
 
 ## Walidacja danych w bazie danych
+
+W naszym projekcie postanowiliśmy skorzystać z bardzo pomocnego narzędzia jakim są Schemy. Wykorzystuje się je, aby zapewnić walidację danych w bazie danych MongoDB. Jest to bardzo użyteczne, ponieważ ogromne możliwości jakie oferują nierelacyjne bazy danych, mogą okazać się mieczem obosiecznym ze względu na zbyt dużą dowolność wprowadzanych danych.
 
 ```js
 const UserSchema = {
@@ -242,306 +443,104 @@ const LogSchema = {
 }
 ```
 
-## Przykładowe dane:
 
-```js
-// User 1
+## Zaimplemenetowane operacje transakcyjne
 
-{
-  "name": "Alice",
-  "surname": "Smith",
-  "email": "alice.smith@example.com",
-  "deposit": 200.50,
-  "chests": [
-    {
-      "chest_id": ObjectId("60ad0bedf123f10d446cf787"),
-      "quantity": 2
-    }
-  ],
-  "skins": [
-    {
-      "name": "M4A1-S | Hyper Beast",
-      "type": "Rifle",
-      "wear": 0.10,
-      "pattern": 45,
-      "price": 300.00,
-      "skin_id": "123e4567-e89b-12d3-a456-426614174000"
-    }
-  ]
-}
+Niżej opisane operacje transakcyjne znajdują się w klasie UserService
 
-// User 2
+### Kupno skrzynki przez użytkownika
+* Wymagało walidacji czy użytkownik posiada wystarczające środki na zakup skrzynki. 
+* Ponieważ jednocześnie wykonujemy update dokumentu danego usera oraz tworzymy nowy log skorzystaliśmy z mechanizmu transakcji poprzez dodanie adnotacji przed definicją funkcji. To rozwiązanie powoduje, że jeśli chociaż jedno zapisanie danych do repozytorium się niepowiedzie to nastąpi rollback wszystkich zmian. 
 
-{
-  "name": "Bob",
-  "surname": "Johnson",
-  "email": "bob.johnson@example.com",
-  "deposit": 100.00,
-  "chests": [
-    {
-      "chest_id": ObjectId("60ad0bedf123f10d446cf788"),
-      "quantity": 4
-    }
-  ],
-  "skins": [
-    {
-      "name": "Desert Eagle | Blaze",
-      "type": "Pistol",
-      "wear": 0.05,
-      "pattern": 78,
-      "price": 150.00,
-      "skin_id": "223e4567-e89b-12d3-a456-426614174001"
-    }
-  ]
-}
+### Otworzenie skrzynki przez użytkownika
+* Wymagało kontroli czy skrzynka istnieje oraz czy jest posiadana przez użytkownika.
+* Na podstawie ogólnych danych o skórkach, generujemy konkretne skórki z ceną zależną od losowych parametrów
+* Analogiczne wykorzystanie mechanizmu transakcji jak przy kupnie skrzynki.
 
-// User 3
+### Operacje o charakterze raportującym
+Oprócz standardowego wypisywanie danych zaimplementowaliśmy:
 
-{
-  "name": "Charlie",
-  "surname": "Brown",
-  "email": "charlie.brown@example.com",
-  "deposit": 75.25,
-  "chests": [
-    {
-      "chest_id": ObjectId("60ad0bedf123f10d446cf789"),
-      "quantity": 3
-    }
-  ],
-  "skins": [
-    {
-      "name": "AWP | Dragon Lore",
-      "type": "Rifle",
-      "wear": 0.02,
-      "pattern": 101,
-      "price": 1000.00,
-      "skin_id": "323e4567-e89b-12d3-a456-426614174002"
-    }
-  ]
-}
+#### Zapytanie: Skin Report
+Zapytanie to przeprowadza łączenie kolekcji Users z kolekcją Chests, aby przygotować raport postaci:
+Skin ID (z kolekcji Chests), Count, Total Spent
 
-// User 4
+Czyli dla każdego rodzaju skina zlicza ile razy został wylosowany oraz sumuje cenę jaką wydano na skrzynki
 
-{
-  "name": "Diana",
-  "surname": "Prince",
-  "email": "diana.prince@example.com",
-  "deposit": 50.00,
-  "chests": [
-    {
-      "chest_id": ObjectId("60ad0bedf123f10d446cf790"),
-      "quantity": 1
-    }
-  ],
-  "skins": [
-    {
-      "name": "Glock-18 | Fade",
-      "type": "Pistol",
-      "wear": 0.03,
-      "pattern": 12,
-      "price": 250.00,
-      "skin_id": "423e4567-e89b-12d3-a456-426614174003"
-    }
-  ]
-}
+```java
+public List<JsonObject> generateSkinReport() {
+    MongoCollection<Document> collection = mongoTemplate.getCollection("users");
+    AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+        new Document("$unwind", "$skins"),
+        new Document("$lookup", new Document("from", "chests")
+            .append("let", new Document("skinId", "$skins.skin_id"))
+            .append("pipeline", Arrays.asList(
+                    new Document("$unwind", "$skins"),
+                    new Document("$match", new Document("$expr", new Document("$eq", Arrays.asList("$skins._id", "$$skinId"))))
+            ))
+            .append("as", "chestSkins")),
+        new Document("$unwind", "$chestSkins"),
+        new Document("$group", new Document("_id", "$skins.skin_id")
+            .append("count", new Document("$sum", 1))
+            .append("totalSpent", new Document("$sum", "$chestSkins.price")))
+    ));
 
-// User 5
-
-{
-  "name": "Eve",
-  "surname": "Adams",
-  "email": "eve.adams@example.com",
-  "deposit": 300.00,
-  "chests": [
-    {
-      "chest_id": ObjectId("60ad0bedf123f10d446cf791"),
-      "quantity": 5
-    }
-  ],
-  "skins": [
-    {
-      "name": "AK-47 | Vulcan",
-      "type": "Rifle",
-      "wear": 0.07,
-      "pattern": 99,
-      "price": 400.00,
-      "skin_id": "523e4567-e89b-12d3-a456-426614174004"
-    }
-  ]
-}
-
-// Chest 1
-
-{
-  "name": "Bravo Case",
-  "price": 3.00,
-  "skins": [
-    {
-      "_id": "623e4567-e89b-12d3-a456-426614174005",
-      "name": "M4A4 | Howl",
-      "rarity": "Covert",
-      "odds": 0.01
-    },
-    {
-      "_id": "723e4567-e89b-12d3-a456-426614174006",
-      "name": "AK-47 | Fire Serpent",
-      "rarity": "Classified",
-      "odds": 0.02
-    }
-  ]
-}
-
-// Chest 2
-
-{
-  "name": "Vanguard Case",
-  "price": 2.50,
-  "skins": [
-    {
-      "_id": "823e4567-e89b-12d3-a456-426614174007",
-      "name": "P90 | Asiimov",
-      "rarity": "Covert",
-      "odds": 0.015
-    },
-    {
-      "_id": "923e4567-e89b-12d3-a456-426614174008",
-      "name": "M4A1-S | Cyrex",
-      "rarity": "Classified",
-      "odds": 0.03
-    }
-  ]
-}
-
-// Chest 3
-
-{
-  "name": "Spectrum Case",
-  "price": 2.75,
-  "skins": [
-    {
-      "_id": "a23e4567-e89b-12d3-a456-426614174009",
-      "name": "USP-S | Neo-Noir",
-      "rarity": "Covert",
-      "odds": 0.012
-    },
-    {
-      "_id": "b23e4567-e89b-12d3-a456-426614174010",
-      "name": "AWP | Fever Dream",
-      "rarity": "Classified",
-      "odds": 0.025
-    }
-  ]
-}
-
-// Chest 4
-
-{
-  "name": "Gamma Case",
-  "price": 2.00,
-  "skins": [
-    {
-      "_id": "c23e4567-e89b-12d3-a456-426614174011",
-      "name": "M4A1-S | Mecha Industries",
-      "rarity": "Covert",
-      "odds": 0.02
-    },
-    {
-      "_id": "d23e4567-e89b-12d3-a456-426614174012",
-      "name": "Glock-18 | Wasteland Rebel",
-      "rarity": "Classified",
-      "odds": 0.03
-    }
-  ]
-}
-
-// Chest 5
-
-{
-  "name": "Chroma Case",
-  "price": 2.25,
-  "skins": [
-    {
-      "_id": "e23e4567-e89b-12d3-a456-426614174013",
-      "name": "AWP | Man-o'-war",
-      "rarity": "Covert",
-      "odds": 0.01
-    },
-    {
-      "_id": "f23e4567-e89b-12d3-a456-426614174014",
-      "name": "AK-47 | Cartel",
-      "rarity": "Classified",
-      "odds": 0.02
-    }
-  ]
-}
-
-// Log 1
-
-{
-  "type": "CHEST_PURCHASE",
-  "user_id": "123e4567-e89b-12d3-a456-426614174000",
-  "date": "2024-05-27T12:00:00Z",
-  "chest_id": "60ad0bedf123f10d446cf787",
-  "details": {
-    "chest_price": 3.00,
-    "quantity": 2
-  }
-}
-
-// Log 2
-
-{
-  "type": "CHEST_OPEN",
-  "user_id": "223e4567-e89b-12d3-a456-426614174001",
-  "date": "2024-05-27T12:15:00Z",
-  "chest_id": "60ad0bedf123f10d446cf788",
-  "details": {
-    "skin_opened_id": "623e4567-e89b-12d3-a456-426614174005"
-  }
-}
-
-// Log 3
-
-{
-  "type": "CHEST_PURCHASE",
-  "user_id": "323e4567-e89b-12d3-a456-426614174002",
-  "date": "2024-05-27T12:30:00Z",
-  "chest_id": "60ad0bedf123f10d446cf789",
-  "details": {
-    "chest_price": 2.50,
-    "quantity": 1
-  }
-}
-
-// Log 4
-
-{
-  "type": "CHEST_OPEN",
-  "user_id": "423e4567-e89b-12d3-a456-426614174003",
-  "date": "2024-05-27T12:45:00Z",
-  "chest_id": "60ad0bedf123f10d446cf790",
-  "details": {
-    "skin_opened_id": "823e4567-e89b-12d3-a456-426614174007"
-  }
-}
-
-// Log 5
-
-{
-  "type": "CHEST_PURCHASE",
-  "user_id": "523e4567-e89b-12d3-a456-426614174004",
-  "date": "2024-05-27T13:00:00Z",
-  "chest_id": "60ad0bedf123f10d446cf791",
-  "details": {
-    "chest_price": 2.75,
-    "quantity": 3
-  }
+    return convertDocumentsToJson(result);
 }
 ```
+
+Wynik zapytania:
+![alt text](image-2.png)
+
+#### Zapytanie: Users Total Skins Values.
+Zapytanie to dla każdego z użytkowników sumuje wartości ich skinów oraz wypisuje je w formacie: Name, Total Value.
+
+```java
+public List<JsonObject> generateUsersTotalSkinsValues() {
+    AggregateIterable<Document> result = mongoTemplate.getCollection("users").aggregate(Arrays.asList(
+        new Document("$unwind", "$skins"),
+        new Document("$group", new Document("_id", "$_id")
+                .append("name", new Document("$first", "$name"))
+                .append("totalValue", new Document("$sum", "$skins.price"))),
+        new Document("$sort", new Document("totalValue", -1))
+    ));
+
+    return convertDocumentsToJson(result);
+}
+```
+
+Wynik zapytania:
+![alt text](image.png)
+
+#### Zapytanie: User Total Spending:
+Zapytanie to zwraca dla danego usera sumę wydanych przez niego pieniędzy na skrzynki.
+
+```java
+public List<JsonObject> generateUserTotalSpending(ObjectId userId) {
+    MongoCollection<Document> collection = mongoTemplate.getCollection("logs");
+    AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+        new Document("$match", new Document("user_id", userId)),
+        new Document("$match", new Document("type", "CHEST_PURCHASE")),
+        new Document("$project", new Document("user_id", 1).append("type", 1)
+            .append("totalAmount", new Document("$multiply", Arrays.asList("$details.chest_price", "$details.quantity")))),
+        new Document("$group", new Document("_id", "$user_id").append("totalAmount", new Document("$sum", "$totalAmount")))
+    ));
+
+    return convertDocumentsToJson(result);
+}
+```
+
+Wynik zapytania:
+![alt text](image-1.png)
+
+Pełny kod zapytań raportujących można znaleźć w klasie ReportService
 
 ## Wykorzystane technologie back-end
 
 ### Podczas projektowania backendu dla naszej aplikacji do zarządzania skrzynkami i skórkami zdecydowaliśmy się na wykorzystanie technologii Spring Boot. Jest to jedno z najbardziej popularnych i wszechstronnych narzędzi w ekosystemie Java, co czyni go idealnym wyborem dla tego typu aplikacji.
+
+### W springu pracowało nam się bardzo przyjemnie. Niezwykle prosto jest tworzyć modele odpowiadające dokumentom z nierelacyjnej bazy danych. Dodatkowo mogliśmy tworzyć modele obiektów nie będących faktycznymi dokumentami, a jedynie elementami dokumentów. Pomimo początkowych obaw pisanie back-endu do nierelacyjnej bazy danych nie było takie straszne.
+
+### Oprócz tego mogliśmy skorzystać z możliwości tworzenia testów do bazy danych. Spring, a przede wszystkim java, dają tutaj ogromne możliwości.
 
 ### Poniej znajdują się poszczególne klasy obsługujące naszą bazę danych w technologii Spring Boot
 
@@ -2033,6 +2032,9 @@ public class UserServiceTest {
 
 ```
 
+### Wyniki testów:
+![alt text](image-6.png)
+
 # Zagadnienie współdostępu do bazy danych
 
 ### MongoDB zapewnia wbudowaną ochronę przed jednoczesnym dostępem do dokumentów poprzez:
@@ -2050,12 +2052,11 @@ Podczas projektowania front-end'u na potrzeby naszego projektu zdecydowaliśmy s
 
 ![](2024-06-03-00-10-16.png)
 
-![](2024-06-03-00-10-41.png)
+![alt text](image-3.png)
 
-![](2024-06-03-00-11-00.png)
+![alt text](image-4.png)
 
-![](2024-06-03-00-11-22.png)
-
+![alt text](image-5.png)
 
 # Wnioski
 
@@ -2078,3 +2079,7 @@ Rozwiązanie: Wymagało to dogłębnej analizy dokumentacji oraz konsultacji z z
 Problem: Logi w systemie zawierały różnorodne typy danych, co powodowało trudności w ich jednolitym przetwarzaniu i wyświetlaniu.
 
 Rozwiązanie: Implementacja polimorficznego podejścia do obsługi różnych typów logów (np. CHEST_PURCHASE, CHEST_OPEN) na backendzie oraz dynamiczne renderowanie tych danych na froncie. Wymagało to dokładnego zaplanowania i przetestowania różnych scenariuszy danych.
+
+# Komentarz
+
+Przygotowanie tego miniprojektu było bardzo rozwijającym zadaniem. Nierelacyjne bazy danych, pomimo utrudnionych operacji agregacji, mają również wiele zalet i jeśli tylko dobrze je wykorzystamy, to możemy tworzyć ciekawe i wydajne projekty.

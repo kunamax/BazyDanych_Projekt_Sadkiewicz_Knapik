@@ -20,7 +20,7 @@ function ReportList() {
                 console.log('Skin Report:', data2);
                 setSkinReport(data2);
 
-                const userId = '6654cfb53a9a4d464cd31150';
+                const userId = '665cfd7c4b58ee76868aca22';
                 const response3 = await fetch(`http://localhost:8080/api/reports/user-total-spending/${userId}`);
                 const data3 = await response3.json();
                 console.log('User Total Spending:', data3);
